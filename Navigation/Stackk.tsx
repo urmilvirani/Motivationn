@@ -43,7 +43,6 @@ const Stackk = () => {
     return (
 
         <Stack.Navigator>
-
             <Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }} />
             <Stack.Screen name="Signin" component={Signin} options={{ headerShown: false }} />
             <Stack.Screen name="Forgot" component={Forgot} options={{ headerShown: false }} />
