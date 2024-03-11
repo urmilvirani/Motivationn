@@ -10,22 +10,15 @@ import Home from '../Screens/Home';
 import BottomTab from './BottomTab';
 import Shop from '../Screens/Shop';
 import Message from '../Screens/Message';
-import Healthplan from '../Screens/Healthplan';
-import Weekly from '../Screens/Weekly';
-import Exercise from '../Screens/Exercise';
-import Recipes from '../Screens/Recipes';
-import Daily from '../Screens/Daily';
-import Product from '../Screens/Product';
-import Exer from '../Screens/Exer';
-import Pilates from '../Screens/Pilates';
-import Recipeidea from '../Screens/Recipeidea';
-import Recipeidea1 from '../Screens/Recipeidea1';
-import Weekspecial from '../Screens/Weekspecial';
-import Recipevideo from '../Screens/Recipevideo';
+
 import Profile from '../Screens/Profile';
 import Detail from '../Screens/Detail';
 
 import Heartrate from '../Metrics/Heartrate';
+
+
+
+
 
 import Blood from '../Metrics/Blood';
 import Weight from '../Metrics/Weight';
