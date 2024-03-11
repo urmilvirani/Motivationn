@@ -17,10 +17,14 @@ import Detail from '../Screens/Detail';
 import Heartrate from '../Metrics/Heartrate';
 
 
-
-
-
 import Blood from '../Metrics/Blood';
+
+
+
+
+
+
+
 import Weight from '../Metrics/Weight';
 import Heartdata from '../Metrics/Heartdata';
 import Blooddata from '../Metrics/Blooddata';
