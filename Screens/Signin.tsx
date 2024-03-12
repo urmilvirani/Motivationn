@@ -6,10 +6,38 @@ import { Google } from '../assets/svg'
 import { Apple } from '../assets/svg'
 import { User } from '../assets/svg'
 import { Tick } from '../assets/svg'
+import webservices from '../Navigation/webservices'
 
 const Signin = ({ navigation }) => {
 
     const [touch, SetTouch] = useState(1)
+
+    const [first, setFirst] = useState('')
+    const [last, setLast] = useState('')
+    const [email, setEmail] = useState('')
+    const [pass, setPass] = useState('')
+    const [otpp, setOtpp] = useState('')
+
+    const data = new FormData()
+    data.append('first_name', first)
+    data.append('last_name', last)
+    data.append('social_type_term', 'email')
+    data.append('email', email)
+    data.append('password', pass)
+    data.append('otp', otpp)
+    data.append('username', email)
+
+    const [isModalVisible, setModalVisible] = useState(false);
+    const otp = async () => {
+
+        await webservices('send_otp_without_auth', 'POST', data)
+            .then((response) => {
+                console.log(response.message)
+                setModalVisible(true)
+            })
+
+    }
+
 
     return (
         <SafeAreaView style={{ backgroundColor: 'rgba(112, 43, 146, 1)', height: '100%', }}>
@@ -113,22 +141,26 @@ const Signin = ({ navigation }) => {
                                 style={{ fontFamily: 'Mulish-Regular', borderWidth: 0.5, borderColor: 'gray', borderRadius: 10, marginTop: 25, padding: 10, color: 'black', width: '92%' }}
                                 placeholder='Enter First Name'
                                 placeholderTextColor={'black'}
+                                onChangeText={(text) => setFirst(text)}
                             />
                             <TextInput
                                 style={{ fontFamily: 'Mulish-Regular', borderWidth: 0.5, borderColor: 'gray', borderRadius: 10, marginTop: 15, padding: 10, color: 'black', width: '92%' }}
                                 placeholder='Enter Last Name'
                                 placeholderTextColor={'black'}
+                                onChangeText={(text) => setLast(text)}
                             />
                             <TextInput
                                 style={{ fontFamily: 'Mulish-Regular', borderWidth: 0.5, borderColor: 'gray', borderRadius: 10, marginTop: 15, padding: 10, color: 'black', width: '92%' }}
                                 placeholder='Enter Email '
                                 placeholderTextColor={'black'}
+                                onChangeText={(text) => setEmail(text)}
                             />
                             <View style={styles.pass}>
                                 <TextInput
                                     style={{ fontFamily: 'Mulish-Regular', width: '90%', padding: 10, color: 'black' }}
                                     placeholder='Enter Password '
                                     placeholderTextColor={'black'}
+                                    onChangeText={(text) => setPass(text)}
                                 />
                                 <Eye />
                             </View>

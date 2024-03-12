@@ -20,11 +20,6 @@ import Heartrate from '../Metrics/Heartrate';
 import Blood from '../Metrics/Blood';
 
 
-
-
-
-//  ghvgh         /
-
 import Weight from '../Metrics/Weight';
 import Heartdata from '../Metrics/Heartdata';
 import Blooddata from '../Metrics/Blooddata';
