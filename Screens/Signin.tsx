@@ -40,6 +40,15 @@ const Signin = ({ navigation }) => {
     const [logemail, setLogemail] = useState('')
     const [logpass, setLogpass] = useState('')
 
+    const [otp3, setOtp3] = useState(['', '', '', '']);
+
+    const handleOtpChange = (index, value) => {
+        const newOtp = [...otp3];
+        newOtp[index] = value;
+        setOtp3(newOtp);
+    };
+
+
     //otp
     // const [f1, setF1] = useState('')
     // const [f2, setF2] = useState('')
@@ -53,7 +62,7 @@ const Signin = ({ navigation }) => {
     data.append('social_type_term', 'email')
     data.append('email', email)
     data.append('password', pass)
-    data.append('otp', otp2)
+    data.append('otp', otp3)
     data.append('username', email)
     data.append('authentication_type', 'email')
 
@@ -385,20 +394,19 @@ const Signin = ({ navigation }) => {
                     </View>
                     <View style={{ alignItems: "center", marginTop: 20 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '80%', }}>
-                            <TextInput
+                            {/* <TextInput
                                 style={{ borderWidth: 1, borderColor: 'black', width: '15%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 }}
                                 placeholderTextColor={'black'}
                                 keyboardType='numeric'
-                                maxLength={4}
+                                maxLength={1}
                                 // ref={fir}
 
                                 onChangeText={(text) =>
                                     setOtp2(text)
                                     // text && second.current.focus()
                                 }
-
                             />
-                            {/* <TextInput
+                            <TextInput
                                 style={{ borderWidth: 1, borderColor: 'black', width: '15%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 }}
                                 placeholderTextColor={'black'}
                                 maxLength={1}
@@ -429,17 +437,23 @@ const Signin = ({ navigation }) => {
                                     setOtp2(text)
                                     !text && third.current.focus()
                                 }}
-                                ref={four} */}
-                            />
+                                ref={four}
+                            /> */}
+                            {/* {borderWidth: 1, borderColor: 'black', width: '15%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 } */}
+
+                            {otp3.map((digit, index) => (
+                                <TextInput
+                                    key={index}
+                                    style={{ borderWidth: 1, borderColor: 'black', width: '15%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 }}
+                                    keyboardType="numeric"
+                                    maxLength={1}
+                                    value={digit}
+                                    onChangeText={(value) => handleOtpChange(index, value)}
+                                />
+                            ))}
                         </View>
                     </View>
-                    {/* <View style={{ alignItems: "center" }}>
-                        <OTPInputView
-                            style={{ width: '80%', height: 100, borderRadius: 30 }}
-z                            pinCount={4}
-                            autoFocusOnLoad
-                        />
-                    </View> */}
+
 
                     <View style={{ flexDirection: 'row', alignItems: "center", marginTop: 10 }}>
                         <Text style={{ color: 'black', fontFamily: "Mulish-Regular", marginStart: 15, }}>Didn’t receive code? </Text>
