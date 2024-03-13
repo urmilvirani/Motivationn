@@ -1,7 +1,12 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Threearrow } from '../assets/svg'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 const Splash = ({ navigation }) => {
+
+
+
     return (
         <View>
 

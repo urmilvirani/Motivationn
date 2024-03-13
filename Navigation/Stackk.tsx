@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Splash from '../Screens/Splash';
@@ -26,12 +26,15 @@ import Blooddata from '../Metrics/Blooddata';
 import Weightdata from '../Metrics/Weightdata';
 import Food from '../Metrics/Food';
 import Editprofile from '../Screens/Editprofile';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
 const Stack = createNativeStackNavigator();
 const Stackk = () => {
+
+
+
     return (
 
         <Stack.Navigator>
@@ -39,6 +42,7 @@ const Stackk = () => {
 
             <Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }} />
             <Stack.Screen name="Signin" component={Signin} options={{ headerShown: false }} />
+
             <Stack.Screen name="Forgot" component={Forgot} options={{ headerShown: false }} />
             <Stack.Screen name="BottamTab" component={BottomTab} options={{ headerShown: false }} />
             <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />

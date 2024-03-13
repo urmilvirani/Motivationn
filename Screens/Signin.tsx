@@ -40,13 +40,9 @@ const Signin = ({ navigation }) => {
     const [logemail, setLogemail] = useState('')
     const [logpass, setLogpass] = useState('')
 
-    const [otp3, setOtp3] = useState(['', '', '', '']);
+    const [otp3, setOtp3] = useState('');
 
-    const handleOtpChange = (index, value) => {
-        const newOtp = [...otp3];
-        newOtp[index] = value;
-        setOtp3(newOtp);
-    };
+
 
 
     //otp
@@ -62,7 +58,7 @@ const Signin = ({ navigation }) => {
     data.append('social_type_term', 'email')
     data.append('email', email)
     data.append('password', pass)
-    data.append('otp', otp3)
+    data.append('otp', otp2)
     data.append('username', email)
     data.append('authentication_type', 'email')
 
@@ -71,31 +67,36 @@ const Signin = ({ navigation }) => {
         setIsTextVisible(!isTextVisible);
     };
 
+    const handleSubmit = (text) => {
+        setOtp2(text)
+    }
+
 
     const login = async () => {
 
-        if (!/\S+@\S+\.\S+/.test(email)) {
-            setLogemail(true)
-        }
-        else {
-            setLogemail(false)
-        }
+        // if (!/\S+@\S+\.\S+/.test(email)) {
+        //     setLogemail(true)
+        // }
+        // else {
+        //     setLogemail(false)
+        // }
 
-        if (pass.length < 6) {
-            setLogpass(true)
-        }
-        else {
-            setLogpass(false)
-        }
-        if (!email || !pass) {
-            return false
-        }
+        // if (pass.length < 6) {
+        //     setLogpass(true)
+        // }
+        // else {
+        //     setLogpass(false)
+        // }
+        // if (!email || !pass) {
+        //     return false
+        // }
 
         try {
             const response = await webservices('user_login', 'POST', data)
-            await AsyncStorage.setItem('token', response?.data?.auth_token)
+            await AsyncStorage.setItem('usertoken', response?.data?.auth_token)
             console.log(response.message);
 
+            navigation.navigate('Home')
         }
         catch (error) {
             console.log('login error', error);
@@ -127,6 +128,7 @@ const Signin = ({ navigation }) => {
         if (!/\S+@\S+\.\S+/.test(email)) {
             setErremail(true)
         }
+
         else {
             setErremail(false)
         }
@@ -163,6 +165,11 @@ const Signin = ({ navigation }) => {
         await webservices('send_otp_without_auth', 'POST', data)
             .then((response) => {
                 console.log(response.data.otp)
+                const fetchotp = response.data.otp;
+                setOtp2(response?.data?.otp)
+                setOtp3(fetchotp)
+                console.log('hello', fetchotp);
+
                 setModalVisible(true)
                 // setOtp1(response.data.otp)
             })
@@ -195,6 +202,7 @@ const Signin = ({ navigation }) => {
     const second = useRef();
     const third = useRef();
     const four = useRef();
+
 
 
 
@@ -392,28 +400,36 @@ const Signin = ({ navigation }) => {
                         <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, textAlign: 'center', marginTop: 10, width: '75%', }}>Please enter four digit code sent
                             to your email {email} </Text>
                     </View>
+                    <Text style={{ color: 'red', textAlign: "center" }}>One Time OTP:{otp3} </Text>
                     <View style={{ alignItems: "center", marginTop: 20 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '80%', }}>
-                            {/* <TextInput
+
+
+
+                            <TextInput
                                 style={{ borderWidth: 1, borderColor: 'black', width: '15%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 }}
                                 placeholderTextColor={'black'}
                                 keyboardType='numeric'
                                 maxLength={1}
-                                // ref={fir}
 
-                                onChangeText={(text) =>
-                                    setOtp2(text)
-                                    // text && second.current.focus()
-                                }
+                                ref={fir}
+
+                                onChangeText={(text) => {
+                                    handleSubmit(text)
+
+                                    text && second.current.focus()
+                                }}
                             />
+
                             <TextInput
                                 style={{ borderWidth: 1, borderColor: 'black', width: '15%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 }}
                                 placeholderTextColor={'black'}
                                 maxLength={1}
                                 keyboardType='numeric'
+
                                 ref={second}
                                 onChangeText={(text) => {
-                                    setOtp2(text)
+                                    handleSubmit(text)
                                     text ? third.current.focus() : fir.current.focus()
                                 }}
                             />
@@ -421,9 +437,10 @@ const Signin = ({ navigation }) => {
                                 style={{ borderWidth: 1, borderColor: 'black', width: '15%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 }}
                                 placeholderTextColor={'black'}
                                 maxLength={1}
+
                                 keyboardType='numeric'
                                 onChangeText={(text) => {
-                                    setOtp2(text)
+                                    handleSubmit(text)
                                     text ? four.current.focus() : second.current.focus()
                                 }}
                                 ref={third}
@@ -432,25 +449,15 @@ const Signin = ({ navigation }) => {
                                 style={{ borderWidth: 1, borderColor: 'black', width: '15%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 }}
                                 placeholderTextColor={'black'}
                                 maxLength={1}
+
                                 keyboardType='numeric'
                                 onChangeText={(text) => {
-                                    setOtp2(text)
+                                    handleSubmit(text)
                                     !text && third.current.focus()
                                 }}
                                 ref={four}
-                            /> */}
-                            {/* {borderWidth: 1, borderColor: 'black', width: '15%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 } */}
+                            />
 
-                            {otp3.map((digit, index) => (
-                                <TextInput
-                                    key={index}
-                                    style={{ borderWidth: 1, borderColor: 'black', width: '15%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 }}
-                                    keyboardType="numeric"
-                                    maxLength={1}
-                                    value={digit}
-                                    onChangeText={(value) => handleOtpChange(index, value)}
-                                />
-                            ))}
                         </View>
                     </View>
 
