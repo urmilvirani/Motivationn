@@ -10,8 +10,10 @@ import webservices from '../Navigation/webservices'
 import Modal from "react-native-modal";
 import CheckBox from '@react-native-community/checkbox';
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import OtpInputs from 'react-native-otp-inputs'
 import OTPInputView from '@twotalltotems/react-native-otp-input'
+
+
+
 
 const Signin = ({ navigation }) => {
 
@@ -27,14 +29,14 @@ const Signin = ({ navigation }) => {
     const [email, setEmail] = useState('')
     const [pass, setPass] = useState('')
     const [confirmpass, setConfirmpass] = useState('')
-    const [otp2, setOtp2] = useState()
-
+    const [otp2, setOtp2] = useState('');
     //validation for register
     const [errfirst, setErrfirst] = useState('')
     const [errlast, setErrlast] = useState('')
     const [erremail, setErremail] = useState('')
     const [errpass, setErrpass] = useState('')
     const [errconfirm, setErrconfirm] = useState('')
+
 
     //validation for login
     const [logemail, setLogemail] = useState('')
@@ -64,39 +66,37 @@ const Signin = ({ navigation }) => {
 
     // hide and show password
     const toggleTextVisibility = () => {
-        setIsTextVisible(!isTextVisible);
+        setIsTextVisible(prevState => !prevState);
     };
 
-    const handleSubmit = (text) => {
-        setOtp2(text)
-    }
+
 
 
     const login = async () => {
 
-        // if (!/\S+@\S+\.\S+/.test(email)) {
-        //     setLogemail(true)
-        // }
-        // else {
-        //     setLogemail(false)
-        // }
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            setLogemail(true)
+        }
+        else {
+            setLogemail(false)
+        }
 
-        // if (pass.length < 6) {
-        //     setLogpass(true)
-        // }
-        // else {
-        //     setLogpass(false)
-        // }
-        // if (!email || !pass) {
-        //     return false
-        // }
+        if (pass.length < 6) {
+            setLogpass(true)
+        }
+        else {
+            setLogpass(false)
+        }
+        if (!email || !pass) {
+            return false
+        }
 
         try {
             const response = await webservices('user_login', 'POST', data)
-            await AsyncStorage.setItem('usertoken', response?.data?.auth_token)
+            await AsyncStorage.setItem('authToken', response?.data?.auth_token)
             console.log(response.message);
 
-            navigation.navigate('Home')
+            navigation.navigate('BottamTab')
         }
         catch (error) {
             console.log('login error', error);
@@ -126,6 +126,7 @@ const Signin = ({ navigation }) => {
         }
 
         if (!/\S+@\S+\.\S+/.test(email)) {
+            Alert.alert('error')
             setErremail(true)
         }
 
@@ -139,16 +140,17 @@ const Signin = ({ navigation }) => {
         else {
             setErrpass(false)
         }
-        if (confirmpass.length < 6) {
-            setErrconfirm(true)
-        }
-        else {
-            setErrconfirm(false)
-        }
+        if (pass !== confirmpass) {
+            setErrconfirm(true);
 
-        if (!first || !last || !email || !pass || !confirmpass) {
+        } else {
+            setErrconfirm(false);
+        }
+        if (!first || !last || !email || !pass || pass !== confirmpass) {
             return false
         }
+
+
         // if (pass !== confirmpass) {
         //     setConfirmpass(true)
         // }
@@ -167,6 +169,7 @@ const Signin = ({ navigation }) => {
                 console.log(response.data.otp)
                 const fetchotp = response.data.otp;
                 setOtp2(response?.data?.otp)
+
                 setOtp3(fetchotp)
                 console.log('hello', fetchotp);
 
@@ -179,24 +182,44 @@ const Signin = ({ navigation }) => {
 
             })
 
+
     }
+
+
+
+
 
     const verify = async () => {
+        try {
 
-        await webservices('verify_otp', 'POST', data)
-            .then((response) => {
-                console.log(response.message)
-                // navigation.navigate('Home')
+            const response = await webservices('verify_otp', 'POST', data)
+            if (response && response.status) {
 
-            })
+                console.log('otp successful');
+
+                const signup = await webservices('user_signup', 'POST', data)
+                if (signup && signup.status) {
+                    console.log('user signup sucesful');
+                    navigation.navigate('BottamTab')
+                }
+                else {
+                    console.log('failed', signup.message);
+
+                }
+            }
+            else {
+                console.log('otp failed', response.message);
+                Alert.alert('Please enter valid OTP.', 'Please double-check the OTP and try again.')
 
 
-        // await webservices('user_signup', 'POST', data)
-        //     .then((response) => {
-        //         console.log(response.data)
-
-        //     })
+            }
+        }
+        catch (error) {
+            console.log('Verify OTP error:', error);
+            // Handle error (e.g., display an error message)
+        }
     }
+
 
     const fir = useRef();
     const second = useRef();
@@ -347,7 +370,7 @@ const Signin = ({ navigation }) => {
                                     secureTextEntry={!isTextVisible}
                                 />
                                 <TouchableOpacity onPress={toggleTextVisibility}>
-                                    <Eye name={isTextVisible ? 'off' : 'on'} />
+                                    <Eye />
                                 </TouchableOpacity>
                             </View>
                             {errpass ? <Text style={{ color: "red" }}>Enter Password*</Text> : null}
@@ -360,7 +383,7 @@ const Signin = ({ navigation }) => {
                                     secureTextEntry={!isTextVisible}
                                 />
                                 <TouchableOpacity onPress={toggleTextVisibility}>
-                                    <Eye name={isTextVisible ? 'off' : 'on'} />
+                                    <Eye />
                                 </TouchableOpacity>
                             </View>
                             {errconfirm ? <Text style={{ color: "red" }}>Enter confirm password*</Text> : null}
@@ -402,20 +425,33 @@ const Signin = ({ navigation }) => {
                     </View>
                     <Text style={{ color: 'red', textAlign: "center" }}>One Time OTP:{otp3} </Text>
                     <View style={{ alignItems: "center", marginTop: 20 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '80%', }}>
-
-
+                        <View style={{
+                            flexDirection: 'row', justifyContent: 'center', width: '90%'
+                        }}>
 
                             <TextInput
+                                style={{ borderWidth: 1, borderColor: 'black', width: '50%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 }}
+                                placeholderTextColor={'black'}
+                                keyboardType='numeric'
+                                maxLength={4}
+
+
+
+                                onChangeText={(text) => setOtp2(text)}
+                            />
+
+
+
+                            {/* <TextInput
                                 style={{ borderWidth: 1, borderColor: 'black', width: '15%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 }}
                                 placeholderTextColor={'black'}
                                 keyboardType='numeric'
-                                maxLength={1}
+                                maxLength={4}
 
                                 ref={fir}
 
                                 onChangeText={(text) => {
-                                    handleSubmit(text)
+                                    setOtp2(text)
 
                                     text && second.current.focus()
                                 }}
@@ -429,7 +465,7 @@ const Signin = ({ navigation }) => {
 
                                 ref={second}
                                 onChangeText={(text) => {
-                                    handleSubmit(text)
+                                    setOtp2(text)
                                     text ? third.current.focus() : fir.current.focus()
                                 }}
                             />
@@ -440,7 +476,7 @@ const Signin = ({ navigation }) => {
 
                                 keyboardType='numeric'
                                 onChangeText={(text) => {
-                                    handleSubmit(text)
+                                    setOtp2(text)
                                     text ? four.current.focus() : second.current.focus()
                                 }}
                                 ref={third}
@@ -452,18 +488,20 @@ const Signin = ({ navigation }) => {
 
                                 keyboardType='numeric'
                                 onChangeText={(text) => {
-                                    handleSubmit(text)
+                                    setOtp2(text)
                                     !text && third.current.focus()
                                 }}
                                 ref={four}
-                            />
+                            /> */}
+
 
                         </View>
                     </View>
 
 
+
                     <View style={{ flexDirection: 'row', alignItems: "center", marginTop: 10 }}>
-                        <Text style={{ color: 'black', fontFamily: "Mulish-Regular", marginStart: 15, }}>Didn’t receive code? </Text>
+                        <Text style={{ color: 'black', fontFamily: "Mulish-Regular", marginStart: 100, }}>Didn’t receive code? </Text>
                         <TouchableOpacity>
                             <Text style={{ color: 'rgba(112, 43, 146, 1)' }}>Resend</Text>
                         </TouchableOpacity>
@@ -488,7 +526,20 @@ const Signin = ({ navigation }) => {
 export default Signin
 
 const styles = StyleSheet.create({
-
+    otpInput: {
+        width: '80%',
+        height: 200,
+    },
+    underlineStyleBase: {
+        width: 30,
+        height: 45,
+        borderWidth: 0,
+        borderBottomWidth: 1,
+        borderBottomColor: 'black',
+    },
+    underlineStyleHighLighted: {
+        borderColor: 'black',
+    },
     white: {
         width: '100%',
         backgroundColor: 'white',

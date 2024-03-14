@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // import { HOME, Message, Shop } from './Stackk';
 import { Homee } from '../assets/svg';
@@ -14,12 +14,14 @@ import { Shop1 } from '../assets/svg';
 import { Shop2 } from '../assets/svg';
 import { Message1 } from '../assets/svg';
 import { Message2 } from '../assets/svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
 
 const Tab = createBottomTabNavigator();
 const BottomTab = () => {
+
 
 
 

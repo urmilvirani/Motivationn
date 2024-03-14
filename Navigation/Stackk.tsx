@@ -16,10 +16,7 @@ import Detail from '../Screens/Detail';
 
 import Heartrate from '../Metrics/Heartrate';
 
-
 import Blood from '../Metrics/Blood';
-
-
 import Weight from '../Metrics/Weight';
 import Heartdata from '../Metrics/Heartdata';
 import Blooddata from '../Metrics/Blooddata';
@@ -30,19 +27,37 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
+
 const Stack = createNativeStackNavigator();
 const Stackk = () => {
 
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+    useEffect(() => {
+        checkIfLoggedIn(); // Check if user is already logged in upon component mount
+    }, []);
+
+    const checkIfLoggedIn = async () => {
+        try {
+            // Check if user is already logged in by retrieving token from AsyncStorage
+            const token = await AsyncStorage.getItem('authToken');
+
+            // setIsLoggedIn(true);
+            setIsLoggedIn(token)
+            console.log(token);
+
+
+        } catch (error) {
+            console.error('Error checking if logged in:', error);
+
+        }
+    };
 
     return (
 
         <Stack.Navigator>
-
-
             <Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }} />
             <Stack.Screen name="Signin" component={Signin} options={{ headerShown: false }} />
-
             <Stack.Screen name="Forgot" component={Forgot} options={{ headerShown: false }} />
             <Stack.Screen name="BottamTab" component={BottomTab} options={{ headerShown: false }} />
             <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
