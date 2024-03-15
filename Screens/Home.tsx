@@ -1,5 +1,5 @@
 import { FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Health } from '../assets/svg'
 import { Vector } from '../assets/svg'
 import { Note } from '../assets/svg'
@@ -8,11 +8,35 @@ import { Headphone } from '../assets/svg'
 import { Que } from '../assets/svg'
 import { Book } from '../assets/svg'
 import { Light } from '../assets/svg'
+import webservices from '../Navigation/webservices'
 
 
 
 const Home = ({ navigation }) => {
 
+
+    const [name, setName] = useState('')
+
+    useEffect(() => {
+
+        profile()
+    }, [])
+
+
+    const profile = async () => {
+        try {
+
+            const name = await webservices('get_user_profile', 'POST', data)
+
+            console.log(name.data.user.first_name);
+            setName(name.data.user.member_name)
+
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
 
 
     const Touch = (itemId: string) => {
@@ -49,7 +73,7 @@ const Home = ({ navigation }) => {
                     <View style={styles.upper}>
                         <View>
                             <Text style={{ fontFamily: 'Mulish-Regular', fontSize: 18 }}>Hello</Text>
-                            <Text style={{ fontFamily: 'Mulish-Bold', fontSize: 24, color: 'white' }}>Urmil Viani</Text>
+                            <Text style={{ fontFamily: 'Mulish-Bold', fontSize: 24, color: 'white' }}>{name}</Text>
                         </View>
 
                         <TouchableOpacity

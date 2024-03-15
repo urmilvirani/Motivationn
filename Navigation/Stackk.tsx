@@ -24,6 +24,7 @@ import Weightdata from '../Metrics/Weightdata';
 import Food from '../Metrics/Food';
 import Editprofile from '../Screens/Editprofile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Lendingpage from '../Screens/Splash';
 
 
 
@@ -31,29 +32,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack = createNativeStackNavigator();
 const Stackk = () => {
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-    useEffect(() => {
-        checkIfLoggedIn(); // Check if user is already logged in upon component mount
-    }, []);
-
-    const checkIfLoggedIn = async () => {
-        try {
-            // Check if user is already logged in by retrieving token from AsyncStorage
-            const token = await AsyncStorage.getItem('authToken');
-
-            // setIsLoggedIn(true);
-            setIsLoggedIn(token)
-            console.log(token);
-
-
-        } catch (error) {
-            console.error('Error checking if logged in:', error);
-
-        }
-    };
-
     return (
+
 
         <Stack.Navigator>
             <Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }} />
@@ -82,6 +62,9 @@ const Stackk = () => {
 
     )
 }
+
+
+
 
 // const HOME = () => {
 //     return (

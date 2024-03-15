@@ -1,4 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+
 
 export default webservice = async (path, method, data) => {
 
@@ -12,11 +14,13 @@ export default webservice = async (path, method, data) => {
 
     console.log("========== REQ End ==========");
 
+    const authToken = await AsyncStorage.getItem('authToken');
+    console.log(authToken);
     let res = await axios.request({
         method: method,
         url: url,
         headers: {
-            'Authorization': 'Bearer UBfQovoxMxJABAz9bQZT3XPkOxsRm9Al4OvAdTVMed92fc50',
+            'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'multipart/form-data'
 
         },

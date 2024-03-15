@@ -1,11 +1,56 @@
 import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Leftarrow } from '../assets/svg'
 import { Edit } from '../assets/svg'
 import Pdf from 'react-native-pdf';
 import WebView from 'react-native-webview';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import webservices from '../Navigation/webservices';
 
 const Profile = ({ navigation }) => {
+
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+
+
+    useEffect(() => {
+
+        profile()
+    }, [])
+
+
+    const profile = async () => {
+        try {
+
+            const name = await webservices('get_user_profile', 'POST')
+
+            console.log(name.data.user.member_name);
+            setName(name.data.user.member_name)
+            setEmail(name.data.user.email)
+
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    const logout = async () => {
+        try {
+            const log = await webservices('logout', 'POST')
+            console.log(log.message);
+
+            await AsyncStorage.removeItem('authToken');
+            // console.log('hiiiiii', response.message);
+
+
+            navigation.navigate('Splash')
+
+        } catch (error) {
+            console.error('Error logging out:', error);
+
+        }
+    };
 
 
     return (
@@ -33,8 +78,8 @@ const Profile = ({ navigation }) => {
 
                     </View>
                     <View style={{ margin: 15 }}>
-                        <Text style={{ color: "white", fontSize: 16, fontFamily: 'Mulish-Bold' }}>Urmil Virani</Text>
-                        <Text style={{ color: "white", fontSize: 14, fontFamily: 'Mulish-Regular' }}>urmilvirani15@gmail.com</Text>
+                        <Text style={{ color: "white", fontSize: 16, fontFamily: 'Mulish-Bold' }}>{name}</Text>
+                        <Text style={{ color: "white", fontSize: 14, fontFamily: 'Mulish-Regular' }}>{email}</Text>
                     </View>
                 </View>
             </View>
@@ -45,7 +90,9 @@ const Profile = ({ navigation }) => {
                 </TouchableOpacity>
 
 
-                <TouchableOpacity style={styles.logout}>
+                <TouchableOpacity
+                    onPress={logout}
+                    style={styles.logout}>
                     <Image source={require('../assets/image/logout.png')} style={{ height: 24, width: 24 }} />
                     <Text style={{
                         color: 'rgba(244, 69, 69, 1)', fontSize: 16, marginStart: 5, fontFamily: 'Mulish-SemiBold'

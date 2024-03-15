@@ -1,11 +1,33 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect } from 'react'
 import { Threearrow } from '../assets/svg'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Splash = ({ navigation }) => {
 
+    useEffect(() => {
+        const getAuthToken = async () => {
+            try {
+                const authToken = await AsyncStorage.getItem('authToken');
+                if (authToken !== null) {
+                    // authToken is retrieved successfully
+                    console.log('Auth Token:', authToken);
+                    navigation.replace('BottamTab')
 
+                    // Now you can use the authToken for making authenticated API calls or any other purpose
+                } else {
+                    // No authToken found, handle this case accordingly
+                    console.log('No Auth Token found');
+                }
+            } catch (error) {
+                console.log('Error retrieving Auth Token:', error);
+                // Handle error, maybe show an alert to the user
+                Alert.alert('Error', 'Failed to retrieve Auth Token');
+            }
+        };
+
+        getAuthToken();
+    }, []);
 
     return (
         <View>

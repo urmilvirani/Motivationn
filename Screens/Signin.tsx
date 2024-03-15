@@ -11,6 +11,8 @@ import Modal from "react-native-modal";
 import CheckBox from '@react-native-community/checkbox';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import OTPInputView from '@twotalltotems/react-native-otp-input'
+import BottomTab from '../Navigation/BottomTab'
+import Splash from './Splash'
 
 
 
@@ -29,7 +31,7 @@ const Signin = ({ navigation }) => {
     const [email, setEmail] = useState('')
     const [pass, setPass] = useState('')
     const [confirmpass, setConfirmpass] = useState('')
-    const [otp2, setOtp2] = useState('');
+
     //validation for register
     const [errfirst, setErrfirst] = useState('')
     const [errlast, setErrlast] = useState('')
@@ -48,10 +50,10 @@ const Signin = ({ navigation }) => {
 
 
     //otp
-    // const [f1, setF1] = useState('')
-    // const [f2, setF2] = useState('')
-    // const [f3, setF3] = useState('')
-    // const [f4, setF4] = useState('')
+    const [f1, setF1] = useState('')
+    const [f2, setF2] = useState('')
+    const [f3, setF3] = useState('')
+    const [f4, setF4] = useState('')
 
     //append
     const data = new FormData()
@@ -60,7 +62,7 @@ const Signin = ({ navigation }) => {
     data.append('social_type_term', 'email')
     data.append('email', email)
     data.append('password', pass)
-    data.append('otp', otp2)
+    data.append('otp', `${f1}${f2}${f3}${f4}`)//`${f1} + ${f1} +${f1} +${f4}`
     data.append('username', email)
     data.append('authentication_type', 'email')
 
@@ -71,37 +73,44 @@ const Signin = ({ navigation }) => {
 
 
 
+    const [user, setUser] = useState('')
 
     const login = async () => {
 
-        if (!/\S+@\S+\.\S+/.test(email)) {
-            setLogemail(true)
-        }
-        else {
-            setLogemail(false)
-        }
+        // if (!/\S+@\S+\.\S+/.test(email)) {
+        //     setLogemail(true)
+        // }
+        // else {
+        //     setLogemail(false)
+        // }
 
-        if (pass.length < 6) {
-            setLogpass(true)
-        }
-        else {
-            setLogpass(false)
-        }
-        if (!email || !pass) {
-            return false
-        }
+        // if (pass.length < 6) {
+        //     setLogpass(true)
+        // }
+        // else {
+        //     setLogpass(false)
+        // }
+        // if (!email || !pass) {
+        //     return false
+        // }
 
         try {
             const response = await webservices('user_login', 'POST', data)
             await AsyncStorage.setItem('authToken', response?.data?.auth_token)
             console.log(response.message);
 
-            navigation.navigate('BottamTab')
+            navigation.replace('BottamTab')
         }
         catch (error) {
             console.log('login error', error);
-            Alert.alert('Error', 'User not Exist')
-
+            // Alert.alert('Error', 'User not Exist')
+            if (error) {
+                setUser(true)
+            }
+            else {
+                setUser(false)
+            }
+            return false
         }
 
     }
@@ -126,7 +135,7 @@ const Signin = ({ navigation }) => {
         }
 
         if (!/\S+@\S+\.\S+/.test(email)) {
-            Alert.alert('error')
+
             setErremail(true)
         }
 
@@ -168,7 +177,7 @@ const Signin = ({ navigation }) => {
             .then((response) => {
                 console.log(response.data.otp)
                 const fetchotp = response.data.otp;
-                setOtp2(response?.data?.otp)
+                // setOtp2(response?.data?.otp)
 
                 setOtp3(fetchotp)
                 console.log('hello', fetchotp);
@@ -194,7 +203,7 @@ const Signin = ({ navigation }) => {
 
             const response = await webservices('verify_otp', 'POST', data)
             if (response && response.status) {
-
+                console.log('33333', `${f1}  ${f2} ${f3} ${f4}`);
                 console.log('otp successful');
 
                 const signup = await webservices('user_signup', 'POST', data)
@@ -308,27 +317,26 @@ const Signin = ({ navigation }) => {
                     >
                         <Text style={{ color: 'white', fontFamily: 'Mulish-Bold' }}>SIGN IN</Text>
                     </TouchableOpacity>
-                    <View style={{ alignItems: "center" }}>
+                    {user ? <Text style={{ color: "red", textAlign: "center", fontFamily: "Mulish-ExtraBold" }}>Account not Found</Text> : null}
+                    {/* <View style={{ alignItems: "center" }}>
                         <View style={{ flexDirection: 'row', marginTop: 20, alignItems: "center", width: '70%', justifyContent: "space-between" }}>
                             <View style={{ width: 80, height: 1, backgroundColor: 'lightgray' }}></View>
                             <Text style={{ color: 'lightgray', fontFamily: 'Mulish-Regular' }}> Or sign in with </Text>
                             <View style={{ width: 80, height: 1, backgroundColor: 'lightgray' }}></View>
                         </View>
-                    </View>
-                    <View style={{ flexDirection: 'row', width: '95%', justifyContent: 'space-between', marginTop: 25, }}>
+                    </View> */}
+                    {/* <View style={{ flexDirection: 'row', width: '95%', justifyContent: 'space-between', marginTop: 25, }}>
                         <TouchableOpacity style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '46%', justifyContent: "center", alignItems: "center", borderRadius: 30, padding: 15 }}>
                             <Facebook />
                         </TouchableOpacity>
                         <TouchableOpacity style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '46%', justifyContent: "center", alignItems: "center", borderRadius: 30, }}>
                             <Google />
                         </TouchableOpacity>
-                        {/* <View style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '32%', justifyContent: "center", alignItems: "center", borderRadius: 30 }}>
-                            <Apple />
-                        </View> */}
-                    </View>
-                    <TouchableOpacity style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '95%', justifyContent: "center", alignItems: "center", borderRadius: 30, padding: 15, marginTop: 15 }}>
+
+                    </View> */}
+                    {/* <TouchableOpacity style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '95%', justifyContent: "center", alignItems: "center", borderRadius: 30, padding: 15, marginTop: 15 }}>
                         <Apple />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
 
 
@@ -426,32 +434,22 @@ const Signin = ({ navigation }) => {
                     <Text style={{ color: 'red', textAlign: "center" }}>One Time OTP:{otp3} </Text>
                     <View style={{ alignItems: "center", marginTop: 20 }}>
                         <View style={{
-                            flexDirection: 'row', justifyContent: 'center', width: '90%'
+                            flexDirection: 'row', justifyContent: 'space-between', width: '90%'
                         }}>
 
+
+
+
                             <TextInput
-                                style={{ borderWidth: 1, borderColor: 'black', width: '50%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 }}
-                                placeholderTextColor={'black'}
-                                keyboardType='numeric'
-                                maxLength={4}
-
-
-
-                                onChangeText={(text) => setOtp2(text)}
-                            />
-
-
-
-                            {/* <TextInput
                                 style={{ borderWidth: 1, borderColor: 'black', width: '15%', borderRadius: 15, color: 'black', height: '100%', textAlign: 'center', fontSize: 20 }}
                                 placeholderTextColor={'black'}
                                 keyboardType='numeric'
-                                maxLength={4}
+                                maxLength={1}
 
                                 ref={fir}
 
                                 onChangeText={(text) => {
-                                    setOtp2(text)
+                                    setF1(text)
 
                                     text && second.current.focus()
                                 }}
@@ -465,7 +463,7 @@ const Signin = ({ navigation }) => {
 
                                 ref={second}
                                 onChangeText={(text) => {
-                                    setOtp2(text)
+                                    setF2(text)
                                     text ? third.current.focus() : fir.current.focus()
                                 }}
                             />
@@ -476,7 +474,7 @@ const Signin = ({ navigation }) => {
 
                                 keyboardType='numeric'
                                 onChangeText={(text) => {
-                                    setOtp2(text)
+                                    setF3(text)
                                     text ? four.current.focus() : second.current.focus()
                                 }}
                                 ref={third}
@@ -488,11 +486,11 @@ const Signin = ({ navigation }) => {
 
                                 keyboardType='numeric'
                                 onChangeText={(text) => {
-                                    setOtp2(text)
+                                    setF4(text)
                                     !text && third.current.focus()
                                 }}
                                 ref={four}
-                            /> */}
+                            />
 
 
                         </View>
@@ -500,14 +498,14 @@ const Signin = ({ navigation }) => {
 
 
 
-                    <View style={{ flexDirection: 'row', alignItems: "center", marginTop: 10 }}>
+                    {/* <View style={{ flexDirection: 'row', alignItems: "center", marginTop: 10 }}>
                         <Text style={{ color: 'black', fontFamily: "Mulish-Regular", marginStart: 100, }}>Didn’t receive code? </Text>
                         <TouchableOpacity>
                             <Text style={{ color: 'rgba(112, 43, 146, 1)' }}>Resend</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
 
-                    <View style={{ alignItems: 'center', marginTop: 20 }}>
+                    <View style={{ alignItems: 'center', marginTop: 40 }}>
                         <TouchableOpacity
                             onPress={verify}
                             style={styles.purple}>
@@ -526,20 +524,7 @@ const Signin = ({ navigation }) => {
 export default Signin
 
 const styles = StyleSheet.create({
-    otpInput: {
-        width: '80%',
-        height: 200,
-    },
-    underlineStyleBase: {
-        width: 30,
-        height: 45,
-        borderWidth: 0,
-        borderBottomWidth: 1,
-        borderBottomColor: 'black',
-    },
-    underlineStyleHighLighted: {
-        borderColor: 'black',
-    },
+
     white: {
         width: '100%',
         backgroundColor: 'white',
