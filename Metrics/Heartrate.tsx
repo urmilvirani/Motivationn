@@ -1,8 +1,35 @@
 import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Leftarrow } from '../assets/svg'
+import webservices from '../Navigation/webservices'
+import { useFocusEffect } from '@react-navigation/native'
 
 const Heartrate = ({ navigation }) => {
+
+    const [heartt, setHeartt] = useState('')
+    useFocusEffect(
+        React.useCallback(() => {
+            heartapi()
+            return () => {
+                // Cleanup function (if needed)
+            };
+        }, [])
+    );
+
+
+    const heartapi = async () => {
+        try {
+            const heart = await webservices('heart_rate/get_details', 'POST')
+            console.log(heart.data);
+            setHeartt(heart.data)
+
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
 
     const Render = ({ item }) => (
         <View style={{ marginStart: 15, }}>
@@ -43,7 +70,7 @@ const Heartrate = ({ navigation }) => {
                             <Text style={{ color: "black", width: '76%', fontFamily: 'Mulish-Bold', fontSize: 18 }}>Average BPM</Text>
                             <Image source={require('../assets/image/Heartbreake.png')} style={{ width: 40, height: 40 }} />
                         </View>
-                        <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 40, marginTop: 20 }}>70</Text>
+                        <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 40, marginTop: 20 }}>{heartt.average_bpm}</Text>
                     </View>
                     <View style={styles.std}>
 
@@ -53,7 +80,7 @@ const Heartrate = ({ navigation }) => {
                             <Text style={{
                                 color: '#4A4A4A', fontFamily: 'Mulish-Regular', fontSize: 18,
                             }}>Pulse Rate:</Text>
-                            <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 18, width: '50%' }}>60-100 bpm</Text>
+                            <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 18, width: '50%' }}> {heartt.standard_pulse_rate}</Text>
                         </View>
                     </View>
                 </View>

@@ -21,7 +21,8 @@ export default webservice = async (path, method, data) => {
         url: url,
         headers: {
             'Authorization': `Bearer ${authToken}`,
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
+            'Cache-Control': 'no-cache'
 
         },
         data: data,
@@ -30,7 +31,7 @@ export default webservice = async (path, method, data) => {
     console.log("========== RES START ==========");
 
     console.log("url:", url);
-    console.log("res", res);
+    console.log("res", res.data.data);
 
     console.log("========== RES End ==========");
 

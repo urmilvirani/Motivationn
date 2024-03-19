@@ -33,3 +33,4 @@ export { default as Shop2 } from './Shop2.svg';
 export { default as Message1 } from './Message1.svg';
 export { default as Message2 } from './Message2.svg';
 export { default as Camera } from './Camera.svg';
+export { default as Cancel } from './Cancel.svg';

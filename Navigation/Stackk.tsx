@@ -25,6 +25,9 @@ import Food from '../Metrics/Food';
 import Editprofile from '../Screens/Editprofile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Lendingpage from '../Screens/Splash';
+import MoreDetail from '../Screens/MoreDetail';
+import Pdf from 'react-native-pdf';
+import Pdfview from '../Screens/Pdfview';
 
 
 
@@ -53,6 +56,8 @@ const Stackk = () => {
             <Stack.Screen name="Weightdata" component={Weightdata} options={{ headerShown: false }} />
             <Stack.Screen name="Food" component={Food} options={{ headerShown: false }} />
             <Stack.Screen name="Editprofile" component={Editprofile} options={{ headerShown: false }} />
+            <Stack.Screen name="MoreDetail" component={MoreDetail} options={{ headerShown: false }} />
+            <Stack.Screen name="Pdfview" component={Pdfview} options={{ headerShown: false }} />
 
 
 

@@ -3,8 +3,12 @@ import React from 'react'
 import { Leftarrow } from '../assets/svg'
 import { Vector } from '../assets/svg'
 import WebView from 'react-native-webview'
+import webservices from '../Navigation/webservices'
 
 const Shop = () => {
+
+
+
     return (
         <View style={{ backgroundColor: "white", height: '100%' }}>
 

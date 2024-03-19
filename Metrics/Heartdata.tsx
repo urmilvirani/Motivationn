@@ -2,8 +2,27 @@ import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image
 import React, { useState } from 'react'
 import { Leftarrow } from '../assets/svg'
 import Modal from "react-native-modal";
+import webservices from '../Navigation/webservices';
 
 const Heartdata = ({ navigation }: any) => {
+
+    const [pulse, setPulse] = useState('')
+    const heart = async () => {
+        try {
+
+            const data = new FormData()
+            data.append('pulse_rate', '70')
+            data.append('datetime', '2025/8/10 5:00:30')
+            const save = await webservices('heart_rate/save', "POST", data)
+            console.log('saved', save.data.list);
+            // setPulse(save)
+
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
 
     const Render = ({ item }: any) => (
         <View style={{ marginStart: 15, }}>
@@ -143,7 +162,7 @@ const Heartdata = ({ navigation }: any) => {
                                 <Text style={{ color: '#702B92', fontFamily: 'Mulish-Bold' }}>CANCLE</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                onPress={() => { setModalVisible(false) }}
+                                onPress={heart}
                                 style={{ backgroundColor: '#702B92', width: '45%', padding: 15, borderRadius: 30, marginStart: 10, alignItems: "center" }}>
                                 <Text style={{ color: 'white', fontFamily: 'Mulish-Bold' }}>SAVE</Text>
                             </TouchableOpacity>

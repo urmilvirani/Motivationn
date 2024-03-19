@@ -1,4 +1,4 @@
-import { FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Health } from '../assets/svg'
 import { Vector } from '../assets/svg'
@@ -9,39 +9,66 @@ import { Que } from '../assets/svg'
 import { Book } from '../assets/svg'
 import { Light } from '../assets/svg'
 import webservices from '../Navigation/webservices'
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useFocusEffect } from '@react-navigation/native'
+import Homeprofile from '../component/Homeprofile'
 
 const Home = ({ navigation }) => {
 
+    const [user, setUser] = useState('')
+    const [loading, setLoading] = useState(true);
+    const [list, setList] = useState('')
 
-    const [name, setName] = useState('')
+    useFocusEffect(
+        React.useCallback(() => {
+            profile();
+            item()
+            return () => {
+                // Cleanup function (if needed)
+            };
+        }, [])
+    );
 
-    useEffect(() => {
-
-        profile()
-    }, [])
 
 
     const profile = async () => {
         try {
+            setLoading(true);
+            const namee = await webservices('get_user_profile', 'POST', data)
 
-            const name = await webservices('get_user_profile', 'POST', data)
+            console.log('jjjjjjjjjjjjjjjjjjjjjjj', namee.data.user.profile_pic);
 
-            console.log(name.data.user.first_name);
-            setName(name.data.user.member_name)
+            setUser(namee.data.user)
 
         }
         catch (error) {
             console.log(error);
 
         }
+        finally {
+            setLoading(false); // Hide loader
+        }
     }
 
 
-    const Touch = (itemId: string) => {
+    const item = async () => {
+        try {
+            const items = await webservices('category/get_categories', 'POST', data)
 
-        navigation.navigate('Detail', { name: itemId })
+            const dataa = items.data.list
+            setList(dataa)
+
+        }
+        catch (error) {
+            console.log(error);
+
+
+        }
+    }
+
+    const Touch = (item) => {
+
+        navigation.navigate('Detail', { item })
 
 
     }
@@ -51,14 +78,14 @@ const Home = ({ navigation }) => {
 
         <TouchableOpacity
 
-            onPress={() => Touch(item.name)}
+            onPress={() => Touch(item)}
             // onPress={() => navigation.navigate('Detail', { userdata: item, })}
             style={styles.flat}>
 
             <View style={{ width: '27%' }}>
-                <Image source={item.image} style={{ height: 34, width: 34 }} />
+                <Image source={{ uri: item.category_image }} style={{ height: 34, width: 34 }} />
             </View>
-            <Text style={{ color: 'black', width: '60%', paddingVertical: 5, fontFamily: "Mulish-Regular", fontSize: 14 }}>{item.name}</Text>
+            <Text style={{ color: 'black', width: '60%', paddingVertical: 5, fontFamily: "Mulish-Regular", fontSize: 14 }}>{item.category_name}</Text>
             <Vector />
         </TouchableOpacity>
 
@@ -69,110 +96,126 @@ const Home = ({ navigation }) => {
 
         <SafeAreaView style={{ flex: 1 }}>
             <View style={{ backgroundColor: 'white', height: '100%' }}>
-                <View style={styles.purple}>
-                    <View style={styles.upper}>
-                        <View>
-                            <Text style={{ fontFamily: 'Mulish-Regular', fontSize: 18 }}>Hello</Text>
-                            <Text style={{ fontFamily: 'Mulish-Bold', fontSize: 24, color: 'white' }}>{name}</Text>
-                        </View>
-
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Profile')}
-                            style={{ backgroundColor: 'white', width: 54, height: 54, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }}>
-                            <Image source={require('../assets/image/Profile.png')} style={{ width: 30, height: 30 }} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                {loading ? <Homeprofile /> : (<View>
+                    <View style={styles.purple}>
 
 
-                <View style={{ alignItems: "center", marginTop: 20 }}>
-                    <FlatList
-                        data={data}
-                        renderItem={Render}
-                        numColumns={2}
-                    />
-                </View>
+                        <View style={styles.upper}>
+                            <View>
 
-
-                <Text style={{ color: 'black', fontSize: 20, fontFamily: 'Mulish-Bold', marginStart: 15, marginTop: 20 }}>Metrics</Text>
-                <ScrollView>
-                    <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 15 }}>
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Heartrate')}
-                            style={styles.heart}>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
-                                <Image source={require('../assets/image/Heart.png')} style={{ height: 44, width: 44, marginStart: 10, marginTop: 10 }} />
-                                <Image source={require('../assets/image/Leftback.png')} style={{ width: 70, height: 60 }} />
+                                <Text style={{ fontFamily: 'Mulish-Regular', fontSize: 18 }}>Hello</Text>
+                                <Text style={{ fontFamily: 'Mulish-Bold', fontSize: 24, color: 'white' }}>{user.first_name} {user.last_name}</Text>
                             </View>
-                            <View style={{ marginStart: 10, marginBottom: 10 }}>
-                                <Text style={{
-                                    color: 'rgba(74, 74, 74, 1)', fontFamily: 'Mulish-Regular', marginTop: 25, fontSize: 16
-                                }}>Heart Rate</Text>
-                                {/* <Text style={{
+
+                            <TouchableOpacity
+
+                                onPress={() => navigation.navigate('Profile')}
+                                style={{ backgroundColor: 'white', width: 54, height: 54, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }}>
+
+
+                                {user.profile_pic ?
+                                    (<Image source={{ uri: user.profile_pic }} style={{ height: 54, width: 54, borderRadius: 12, }} />)
+                                    :
+                                    (<Image source={require('../assets/image/Profile.png')} style={{ width: 30, height: 30 }} />)}
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+
+
+                    <View style={{ alignItems: "center", }}>
+
+                        {list ? <FlatList
+                            data={list}
+                            renderItem={Render}
+                            numColumns={2}
+                        /> : null}
+                    </View>
+
+
+                    <Text style={{ color: 'black', fontSize: 20, fontFamily: 'Mulish-Bold', marginStart: 15, marginTop: 10 }}>Metrics</Text>
+                    <ScrollView>
+                        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('Heartrate')}
+                                style={styles.heart}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
+                                    <Image source={require('../assets/image/Heart.png')} style={{ height: 44, width: 44, marginStart: 10, marginTop: 10 }} />
+                                    <Image source={require('../assets/image/Leftback.png')} style={{ width: 70, height: 60 }} />
+                                </View>
+                                <View style={{ marginStart: 10, marginBottom: 10 }}>
+                                    <Text style={{
+                                        color: 'rgba(74, 74, 74, 1)', fontFamily: 'Mulish-Regular', marginTop: 25, fontSize: 16
+                                    }}>Heart Rate</Text>
+                                    {/* <Text style={{
                                 color: 'black', fontFamily: 'Mulish-Bold', fontSize: 18
                             }}>96 bpm</Text> */}
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Blood')}
-                            style={styles.heartt}>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
-                                <Image source={require('../assets/image/Heart1.png')} style={{ height: 44, width: 44, marginStart: 10, marginTop: 10 }} />
-                                <Image source={require('../assets/image/Leftcircle.png')} style={{ width: 70, height: 60 }} />
-                            </View>
-                            <View style={{ marginStart: 10, marginBottom: 10 }}>
-                                <Text style={{
-                                    color: 'rgba(74, 74, 74, 1)', fontFamily: 'Mulish-Regular', marginTop: 25, fontSize: 16
-                                }}>Blood Pressure</Text>
-                                {/* <Text style={{
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('Blood')}
+                                style={styles.heartt}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
+                                    <Image source={require('../assets/image/Heart1.png')} style={{ height: 44, width: 44, marginStart: 10, marginTop: 10 }} />
+                                    <Image source={require('../assets/image/Leftcircle.png')} style={{ width: 70, height: 60 }} />
+                                </View>
+                                <View style={{ marginStart: 10, marginBottom: 10 }}>
+                                    <Text style={{
+                                        color: 'rgba(74, 74, 74, 1)', fontFamily: 'Mulish-Regular', marginTop: 25, fontSize: 16
+                                    }}>Blood Pressure</Text>
+                                    {/* <Text style={{
                                 color: 'black', fontFamily: 'Mulish-Bold', fontSize: 18
                             }}>120/80 mmHg</Text> */}
-                            </View>
-                        </TouchableOpacity>
-                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Weight')}
-                            style={styles.heart}>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
-                                <Image source={require('../assets/image/weight.png')} style={{ height: 44, width: 44, marginStart: 10, marginTop: 10 }} />
-                                <Image source={require('../assets/image/Leftcircle.png')} style={{ width: 70, height: 60 }} />
-                            </View>
-                            <View style={{ marginStart: 10, marginBottom: 10 }}>
-                                <Text style={{
-                                    color: 'rgba(74, 74, 74, 1)', fontFamily: 'Mulish-Regular', marginTop: 25, fontSize: 16
-                                }}>Weight Logging</Text>
-                                {/* <Text style={{
+                        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('Weight')}
+                                style={styles.heart}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
+                                    <Image source={require('../assets/image/weight.png')} style={{ height: 44, width: 44, marginStart: 10, marginTop: 10 }} />
+                                    <Image source={require('../assets/image/Leftcircle.png')} style={{ width: 70, height: 60 }} />
+                                </View>
+                                <View style={{ marginStart: 10, marginBottom: 10 }}>
+                                    <Text style={{
+                                        color: 'rgba(74, 74, 74, 1)', fontFamily: 'Mulish-Regular', marginTop: 25, fontSize: 16
+                                    }}>Weight Logging</Text>
+                                    {/* <Text style={{
                                 color: 'black', fontFamily: 'Mulish-Bold', fontSize: 18
                             }}>152.2 lbs</Text> */}
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Food')}
-                            style={styles.heartt}>
-                            <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
-                                <Image source={require('../assets/image/fruit.png')} style={{ height: 44, width: 44, marginStart: 10, marginTop: 10 }} />
-                                <Image source={require('../assets/image/Leftback.png')} style={{ width: 70, height: 60 }} />
-                            </View>
-                            <View style={{ marginStart: 10, marginBottom: 10 }}>
-                                <Text style={{
-                                    color: 'rgba(74, 74, 74, 1)', fontFamily: 'Mulish-Regular', marginTop: 25, fontSize: 16
-                                }}>Food Logging</Text>
-                                {/* <Text style={{
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('Food')}
+                                style={styles.heartt}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
+                                    <Image source={require('../assets/image/fruit.png')} style={{ height: 44, width: 44, marginStart: 10, marginTop: 10 }} />
+                                    <Image source={require('../assets/image/Leftback.png')} style={{ width: 70, height: 60 }} />
+                                </View>
+                                <View style={{ marginStart: 10, marginBottom: 10 }}>
+                                    <Text style={{
+                                        color: 'rgba(74, 74, 74, 1)', fontFamily: 'Mulish-Regular', marginTop: 25, fontSize: 16
+                                    }}>Food Logging</Text>
+                                    {/* <Text style={{
                                 color: 'black', fontFamily: 'Mulish-Bold', fontSize: 18
                             }}>350 gm</Text> */}
-                            </View>
-                        </TouchableOpacity>
-                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
 
-                </ScrollView>
+                    </ScrollView>
+                </View>)}
 
-                <View style={{ bottom: 10, flexDirection: 'row', justifyContent: 'center' }}>
-                    <View style={styles.request}>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                    <TouchableOpacity
+
+                        style={styles.request}>
                         <Image source={require('../assets/image/phone.png')} style={{ width: 24, height: 24 }} />
                         <Text style={{ color: 'black', marginStart: 10, fontFamily: 'Mulish-Bold' }}>Request Callback</Text>
-                    </View>
+                    </TouchableOpacity>
                     <View style={styles.book}>
                         <Image source={require('../assets/image/assessment.png')} style={{ width: 24, height: 24 }} />
                         <Text style={{ color: 'black', marginStart: 10, fontFamily: 'Mulish-Bold' }}>Book Assessment</Text>

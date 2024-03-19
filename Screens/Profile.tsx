@@ -1,37 +1,45 @@
-import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState, } from 'react'
 import { Leftarrow } from '../assets/svg'
 import { Edit } from '../assets/svg'
 import Pdf from 'react-native-pdf';
 import WebView from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import webservices from '../Navigation/webservices';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Profile = ({ navigation }) => {
 
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
+    const [user, setUser] = useState('')
+    const [avatarSource, setAvatarSource] = useState('')
+    const [loading, setLoading] = useState(true);
 
 
-    useEffect(() => {
-
-        profile()
-    }, [])
+    useFocusEffect(
+        React.useCallback(() => {
+            profile();
+            return () => {
+                // Cleanup function (if needed)
+            };
+        }, [])
+    );
 
 
     const profile = async () => {
         try {
-
+            setLoading(true)
             const name = await webservices('get_user_profile', 'POST')
 
             console.log(name.data.user.member_name);
-            setName(name.data.user.member_name)
-            setEmail(name.data.user.email)
+            setUser(name.data.user)
 
         }
         catch (error) {
             console.log(error);
 
+        }
+        finally {
+            setLoading(false)
         }
     }
 
@@ -74,13 +82,25 @@ const Profile = ({ navigation }) => {
                     }}></View>
                 </View>
                 <View style={{ flexDirection: "row" }}>
-                    <View style={{ width: 100, height: 100, backgroundColor: 'gray', marginTop: 15, marginStart: 15, borderRadius: 15 }}>
 
-                    </View>
-                    <View style={{ margin: 15 }}>
-                        <Text style={{ color: "white", fontSize: 16, fontFamily: 'Mulish-Bold' }}>{name}</Text>
-                        <Text style={{ color: "white", fontSize: 14, fontFamily: 'Mulish-Regular' }}>{email}</Text>
-                    </View>
+                    {user.profile_pic ?
+                        (<Image source={{ uri: user.profile_pic }} style={{ width: 100, height: 100, backgroundColor: 'gray', marginTop: 15, marginStart: 15, borderRadius: 15 }} />)
+                        :
+                        (
+                            <View style={{ width: 100, height: 100, backgroundColor: 'lightgray', marginTop: 15, marginStart: 15, borderRadius: 15, alignItems: 'center', justifyContent: "center" }}>
+                                <Image source={require('../assets/image/Profile.png')} style={{ width: 50, height: 50 }} />
+                            </View>
+                        )
+                    }
+
+                    {loading ? (<View style={{ marginStart: 50, marginTop: 20 }}>
+                        <ActivityIndicator size='large' color='white' />
+                    </View>)
+                        :
+                        (<View style={{ margin: 15 }}>
+                            <Text style={{ color: "white", fontSize: 16, fontFamily: 'Mulish-Bold' }}>{user.first_name} {user.last_name}</Text>
+                            <Text style={{ color: "white", fontSize: 14, fontFamily: 'Mulish-Regular' }}>{user.email}</Text>
+                        </View>)}
                 </View>
             </View>
             <View style={{ height: '80%', justifyContent: "flex-end", bottom: 30 }}>

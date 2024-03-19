@@ -31,7 +31,7 @@ const BottomTab = () => {
             tabBarActiveTintColor: 'white',
             tabBarInactiveTintColor: 'gray',
 
-            tabBarStyle: { backgroundColor: 'rgba(112, 43, 146, 1)', borderRadius: 30, height: 70, },
+            tabBarStyle: { backgroundColor: 'rgba(112, 43, 146, 1)', borderTopRightRadius: 30, borderTopLeftRadius: 30, height: 70, },
 
 
         }}>

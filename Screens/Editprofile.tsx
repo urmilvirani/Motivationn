@@ -1,19 +1,21 @@
-import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking, ScrollView, ImageBackground, TextInput } from 'react-native'
+import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking, ScrollView, ImageBackground, TextInput, ActivityIndicator, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Leftarrow } from '../assets/svg'
 import { Camera } from '../assets/svg'
+import { Cancel } from '../assets/svg'
 import { err } from 'react-native-svg'
 import webservices from '../Navigation/webservices'
 import Modal from 'react-native-modal'
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useFocusEffect } from '@react-navigation/native'
 
 const Editprofile = ({ navigation }) => {
 
     //show user's detail
-    const [name, setName] = useState('')
-    const [surname, setSurname] = useState('')
-    const [mail, setMail] = useState('')
-
+    const [user, setUser] = useState('')
+    const [profileImg, setProfileImg] = useState('')
 
     //for update the name
     const [first, setFirst] = useState('')
@@ -25,81 +27,102 @@ const Editprofile = ({ navigation }) => {
     //for open modal
     const [isModalVisible, setModalVisible] = useState(false);
 
-
-
-    const data = new FormData()
-    data.append('first_name', first)
-    data.append('last_name', last)
-    data.append('email', email)
-    data.append('profile_pic', profilee)
+    const [loading, setLoading] = useState(true);
 
 
 
-    useEffect(() => {
 
-        profile();
 
-    }, [])
+    useFocusEffect(
+        React.useCallback(() => {
+            profile();
+            return () => {
+                // Cleanup function (if needed)
+            };
+        }, [])
+    );
+
 
 
     const profile = async () => {
         try {
 
-            const name = await webservices('get_user_profile', 'POST')
+            const profileData = await webservices('get_user_profile', 'POST')
 
-            console.log(name.data.user.member_name);
-            setName(name.data.user.first_name)
-            setSurname(name.data.user.last_name)
-            setEmail(name.data.user.email)
-            setMail(name.data.user.email)
+            console.log('hiiiii', profileData.data.user.profile_pic);
+
+            setProfileImg(profileData.data.user.profile_pic)
+            setUser(profileData.data.user)
         }
         catch (error) {
             console.log(error);
 
         }
     }
+
 
     const editprofile = async () => {
 
         try {
+
+
+            const data = new FormData()
+
+            data.append('first_name', first)
+            data.append('last_name', last)
+            data.append('email', email)
+            data.append('profile_pic', {
+                uri: profileImg,
+                type: 'image/jpg',
+                name: 'photo.jpg',
+            });
+
             const response = await webservices('update_user_profile', 'POST', data)
-            console.log(response.message);
-            setEmail(response.data.user.email)
+            if (response && response.status) {
+                console.log(response.message);
+                Alert.alert(response.message)
+                setEmail(response.data.user.email)
 
-            const res = await webservices('get_user_profile', 'POST', data)
+                const res = await webservices('get_user_profile', 'POST', data)
+                if (response && response.status) {
+                    console.log(res.message);
 
-            console.log(res.message);
+                }
+                else {
+                    console.log('hello', res.message);
+
+                }
+            }
+
 
         }
         catch (error) {
             console.log(error);
 
         }
+
+
     }
 
-    const [profilee, setProfilee] = useState('')
-    const selectimage = () => {
-        let option = {
-            mediaType: 'photo',
-            maxWidth: 200,
-            maxHeight: 300,
-            includeBase: true
-        }
-        launchImageLibrary(option, (response) => {
-            if (response.didCancel) {
-                console.log('user cancelled pic');
-                return
+    const selectImage = async () => {
+
+        await launchImageLibrary({ mediaType: 'photo' }, response => {
+            if (!response.didCancel && !response.error) {
+                console.log(response.assets[0].uri);
+
+                setProfileImg(response.assets[0].uri);
             }
-            else if (response.error) {
-                console.log(response.error);
-                return
+            else {
+                // Handle cancellation or errors
+                console.log('Image selection cancelled or encountered an error.');
             }
 
-            console.log('image', response.assets[0]);
-            setProfilee(response.assets[0])
+        });
 
-        })
     }
+
+
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -117,35 +140,36 @@ const Editprofile = ({ navigation }) => {
 
                     </View>
                 </View>
+
                 <View style={{ alignItems: 'center', }}>
                     <TouchableOpacity
-                        onPress={selectimage}
-                        style={{ alignItems: "center", marginTop: 25, backgroundColor: 'gray', height: 150, width: 150, borderRadius: 80 }}>
-                        {profilee ?
-                            (<Image source={{ uri: profilee.uri }} style={{ height: 150, width: 150, borderRadius: 80 }} />)
+                        onPress={() => setModalVisible(true)}
+                        style={{ alignItems: "center", marginTop: 25, height: 150, width: 150, borderRadius: 80 }}>
+
+
+                        {profileImg ?
+                            (<Image source={{ uri: profileImg }} style={{ height: 150, width: 150, borderRadius: 80 }} />)
                             :
-                            (<Text style={{ color: 'white', marginTop: 70, fontSize: 18 }}>Upload Image</Text>)
+                            (<View style={{ backgroundColor: 'lightgray', height: 150, width: 150, borderRadius: 80, alignItems: "center", justifyContent: "center" }}>
+                                <Image source={require('../assets/image/Profile.png')} style={{ height: 70, width: 70, }} />
+                            </View>)
                         }
+
+
+
+
+
                     </TouchableOpacity>
                 </View>
-                {/* <TouchableOpacity
-                    style={{ position: 'absolute' }}
-
-                >
-                    <View
-
-                        style={styles.camera}>
-                        <Camera />
-                    </View>
-                </TouchableOpacity> */}
 
 
-            </View>
+
+            </View >
 
             <ScrollView>
                 <View style={{ marginTop: 90, alignItems: "center" }}>
                     <TextInput
-                        placeholder={name}
+                        placeholder={user.first_name}
                         placeholderTextColor={'black'}
                         style={{
                             color: 'black', borderWidth: 1, borderColor: 'rgba(234, 234, 234, 1)', width: '92%', borderRadius: 10, padding: 15
@@ -153,7 +177,7 @@ const Editprofile = ({ navigation }) => {
                         onChangeText={(text) => setFirst(text)}
                     />
                     <TextInput
-                        placeholder={surname}
+                        placeholder={user.last_name}
                         placeholderTextColor={'black'}
                         style={{
                             color: 'black', borderWidth: 1, borderColor: 'rgba(234, 234, 234, 1)', width: '92%', borderRadius: 10, marginTop: 15, padding: 15
@@ -161,16 +185,18 @@ const Editprofile = ({ navigation }) => {
                         onChangeText={(text) => setLast(text)}
                     />
                     <View style={{ borderWidth: 1, borderColor: 'rgba(234, 234, 234, 1)', width: '92%', borderRadius: 10, marginTop: 15, padding: 20 }} >
-                        <Text style={{ color: "black" }}>{mail}</Text>
+                        <Text style={{ color: "black" }}>{user.email}</Text>
                     </View>
 
                 </View>
 
             </ScrollView>
             <View style={{ alignItems: "center" }}>
+
                 <TouchableOpacity
                     onPress={editprofile}
                     style={styles.save}>
+
                     <Text style={{ color: 'white', textAlign: 'center' }}>SAVE</Text>
                 </TouchableOpacity>
             </View>
@@ -178,19 +204,26 @@ const Editprofile = ({ navigation }) => {
                 isVisible={isModalVisible}
                 style={styles.modal}
             >
-                <View style={{ alignItems: "center" }}>
-                    <View style={styles.cameraa}>
-                        <Text style={{ color: 'white', textAlign: 'center' }}>Camera</Text>
+                <View style={{ flex: 1 }}>
+                    <Text style={{ color: 'black', marginTop: 20, fontSize: 18, fontFamily: 'Mulish-Bold', marginStart: 20 }}>Upload Photo</Text>
+                    <View style={{ flexDirection: "row", marginTop: 20 }}>
+                        {/* <TouchableOpacity
+                            // onPress={() => selectImage('camera')}
+                            style={{ borderWidth: 1, borderColor: 'gray', width: '14%', padding: 10, borderRadius: 10, alignItems: "center", justifyContent: "center", marginStart: 20 }}>
+                            <Camera />
+                        </TouchableOpacity> */}
+                        <TouchableOpacity
+
+                            onPress={selectImage}
+                            style={{ borderWidth: 1, borderColor: 'gray', width: '14%', padding: 10, borderRadius: 10, alignItems: "center", justifyContent: "center", marginStart: 20 }}>
+                            {/* <Camera /> */}
+                            <Image source={require('../assets/image/gallary.jpeg')} style={{ height: 25, width: 30, }} />
+                        </TouchableOpacity>
                     </View>
                     <TouchableOpacity
-
-                        style={styles.cameraaa}>
-                        <Text style={{ color: 'white', textAlign: 'center' }}>Albums</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
                         onPress={() => setModalVisible(false)}
-                        style={styles.back}>
-                        <Text style={{ color: 'white', textAlign: 'center' }}>Back</Text>
+                        style={{ position: 'absolute', width: '98%', alignItems: 'flex-end', bottom: 100, }}>
+                        <Cancel />
                     </TouchableOpacity>
                 </View>
             </Modal>
@@ -216,12 +249,12 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         height: 35,
         width: 35,
-        borderColor: 'rgba(254, 254, 254, 1)',
+        borderColor: 'red',
         borderWidth: 0.5,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 180,
-        marginStart: 210
+        top: 180,
+        marginStart: 230
 
 
     },
@@ -238,7 +271,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         backgroundColor: 'white',
         width: '100%',
-        height: '25%',
+        height: '15%',
         marginStart: 0,
         marginBottom: 0,
         bottom: 0,

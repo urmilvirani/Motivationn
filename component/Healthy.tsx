@@ -1,14 +1,20 @@
 import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Play, Vector, Youtube } from '../assets/svg'
 import { Download } from '../assets/svg'
+import webservices from '../Navigation/webservices'
 
 
-const Youtube1 = () => {
+
+
+const Youtube1 = ({ data, navigation }) => {
+
     return (
-        <TouchableOpacity style={{ alignItems: "center" }}>
+        <TouchableOpacity
+            onPress={() => navigation.navigate('MoreDetail', { data })}
+            style={{ alignItems: "center" }}>
             <View style={styles.view}>
-                <Image source={require('../assets/image/image.png')} style={styles.image} />
+                <Image source={{ uri: data.thumbnail_image }} style={styles.image} />
                 <View style={{ alignItems: "flex-end", width: '95%' }}>
                     <View style={styles.white}>
                         <View style={styles.red}>
@@ -16,7 +22,7 @@ const Youtube1 = () => {
                         </View>
                     </View>
                 </View>
-                <Text style={{ color: "black", fontFamily: 'Mulish-Bold', fontSize: 18, marginStart: 10 }}>Fat Loss VS Weight Loss</Text>
+                <Text style={{ color: "black", fontFamily: 'Mulish-Bold', fontSize: 18, marginStart: 10 }}>{data.title}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', width: '45%', justifyContent: "space-between", marginStart: 10 }}>
                     <Text style={{ color: 'black', }}>12:58 mins</Text>
                     <View style={{ width: 5, height: 5, backgroundColor: 'gray', borderRadius: 10 }}></View>
@@ -47,20 +53,22 @@ const Image1 = () => {
 
     return (
         <TouchableOpacity style={{ alignItems: "center", marginTop: 10 }}>
-            <Image source={require('../assets/image/Inspiration.png')} style={{ width: '95%', height: 388, borderRadius: 10 }} />
+            <Image source={{ uri: 'https://storage.googleapis.com/mwmdev/images/category_item/RC_1698843560.jpg' }} style={{ width: '95%', height: 388, borderRadius: 10 }} />
         </TouchableOpacity>
 
     )
 }
 
-const Pdf1 = () => {
+const Pdf1 = ({ data, navigation }) => {
     return (
-        <TouchableOpacity style={{ alignItems: 'center' }}>
+        <TouchableOpacity
+            onPress={() => navigation.navigate('Pdfview', { data })}
+            style={{ alignItems: 'center' }}>
             <View style={{ backgroundColor: '#F5F5F5', flexDirection: 'row', alignItems: "center", padding: 10, width: '95%', borderRadius: 10, marginTop: 10 }}>
                 <View style={{ width: '10%' }}>
                     <Image source={require('../assets/image/pdf.png')} style={{ height: 30, width: 30 }} />
                 </View>
-                <Text style={{ color: "black", fontFamily: "Mulish-Bold", width: "84%" }}>Healthy Men at All Ages</Text>
+                <Text style={{ color: "black", fontFamily: "Mulish-Bold", width: "84%" }}>{data.title}</Text>
                 <Download />
             </View>
         </TouchableOpacity>

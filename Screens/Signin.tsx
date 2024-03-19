@@ -45,7 +45,7 @@ const Signin = ({ navigation }) => {
     const [logpass, setLogpass] = useState('')
 
     const [otp3, setOtp3] = useState('');
-
+    const [otperror, setOtperror] = useState('')
 
 
 
@@ -173,10 +173,12 @@ const Signin = ({ navigation }) => {
 
 
         //otp send
-        await webservices('send_otp_without_auth', 'POST', data)
-            .then((response) => {
+        try {
+            const response = await webservices('send_otp_without_auth', 'POST', data)
+            if (response && response.status) {
+                console.log(response.message);
                 console.log(response.data.otp)
-                const fetchotp = response.data.otp;
+                const fetchotp = response?.data?.otp;
                 // setOtp2(response?.data?.otp)
 
                 setOtp3(fetchotp)
@@ -184,12 +186,20 @@ const Signin = ({ navigation }) => {
 
                 setModalVisible(true)
                 // setOtp1(response.data.otp)
-            })
-            .catch((error) => {
-                console.log(error);
+            }
+            else {
+                console.log(response.message);
+                Alert.alert('error', response.message)
+
+                // console.log(response.message);
+
+            }
+        }
+        catch (error) {
+            console.log(error);
 
 
-            })
+        }
 
 
     }
@@ -204,12 +214,15 @@ const Signin = ({ navigation }) => {
             const response = await webservices('verify_otp', 'POST', data)
             if (response && response.status) {
                 console.log('33333', `${f1}  ${f2} ${f3} ${f4}`);
+
                 console.log('otp successful');
 
                 const signup = await webservices('user_signup', 'POST', data)
                 if (signup && signup.status) {
                     console.log('user signup sucesful');
-                    navigation.navigate('BottamTab')
+                    // navigation.navigate('BottamTab')
+                    setModalVisible(false)
+                    Alert.alert('Sign up Successful', 'Sign In with Email & Password')
                 }
                 else {
                     console.log('failed', signup.message);
@@ -219,7 +232,12 @@ const Signin = ({ navigation }) => {
             else {
                 console.log('otp failed', response.message);
                 Alert.alert('Please enter valid OTP.', 'Please double-check the OTP and try again.')
-
+                if (response.message) {
+                    setOtperror(true)
+                }
+                else {
+                    setOtperror(false)
+                }
 
             }
         }
@@ -495,6 +513,7 @@ const Signin = ({ navigation }) => {
 
                         </View>
                     </View>
+                    {otperror ? <Text style={{ color: 'red' }}>Please double-check the OTP and try again</Text> : null}
 
 
 
@@ -505,7 +524,7 @@ const Signin = ({ navigation }) => {
                         </TouchableOpacity>
                     </View> */}
 
-                    <View style={{ alignItems: 'center', marginTop: 40 }}>
+                    <View style={{ alignItems: 'center', marginTop: 30 }}>
                         <TouchableOpacity
                             onPress={verify}
                             style={styles.purple}>
