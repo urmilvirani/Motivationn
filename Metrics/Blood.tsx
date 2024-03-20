@@ -1,26 +1,103 @@
-import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking } from 'react-native'
-import React from 'react'
+import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking, TextInput } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { Leftarrow } from '../assets/svg'
+import Modal from "react-native-modal";
+import webservices from '../Navigation/webservices';
 
-const Blood = ({ navigation }) => {
+
+const Blood = ({ navigation }: any) => {
+
+
+    const [getdata, SetGetdata] = useState('')
+    const [todays, setTodays] = useState('')
+    const [systolic, setSystolic] = useState('')
+    const [diastolic, setDiastolic] = useState('')
+    const [pulse, setPulse] = useState('')
+    const [isModalVisible, setModalVisible] = useState(false);
+
+    useEffect(() => {
+        blood()
+
+    }, [])
+    const blood = async () => {
+        try {
+            const response = await webservices('blood_pressure/get_details', 'POST')
+            console.log(response.data);
+            SetGetdata(response?.data)
+
+            const res = await webservices('blood_pressure/list', 'POST')
+            const today = new Date().toISOString().slice(0, 10);
+            const todaysData = res.data.list.filter(item => item.date === today);
+            setTodays(todaysData)
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    const save = async () => {
+        try {
+
+            const data = {
+                "data": [
+                    {
+                        "term_id": 20,
+                        "value": systolic
+                    },
+                    {
+                        "term_id": 21,
+                        "value": diastolic
+                    },
+                    {
+                        "term_id": 22,
+                        "value": pulse
+                    }
+                ]
+            };
+
+            const res = await webservices('blood_pressure/save', 'POST', data)
+            console.log(res);
+
+        }
+        catch (error) {
+
+        }
+    }
+
 
     const Render = ({ item }) => (
+
         <View style={{ marginStart: 15 }}>
-            <View style={{ flexDirection: 'row', marginTop: 20, width: '95%', justifyContent: 'space-between' }}>
-                <View >
-                    <Text style={{ color: 'black', fontFamily: 'Mulish-Regular' }}>{item.name} {item.tag}</Text>
-                    <Text style={{ color: 'black', marginTop: 5, fontFamily: 'Mulish-Regular' }}>{item.name1} {item.tag1}</Text>
-                    <Text style={{ color: 'black', marginTop: 5, fontFamily: 'Mulish-Regular' }}>{item.name2} {item.tag2}</Text>
+
+            {item.list.map((heartData: any, index: number) => (
+                <View key={index}>
+                    <View style={{ width: '95%', marginTop: 10 }}>
+                        {heartData.reading_details.map((detail: any, i: number) => (
+                            <View key={i}>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={{ color: 'black', fontFamily: 'Mulish-Regular' }}>{detail.title} :</Text>
+                                    <Text style={{ color: 'black', fontFamily: 'Mulish-Regular' }}> {detail.value}</Text>
+
+                                </View>
+
+                            </View>
+                        ))}
+                        <View style={{
+                            width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 15
+                        }}></View>
+
+                    </View>
+
                 </View>
-                <Text style={{ color: '#4A4A4A' }}>{item.time}</Text>
-            </View>
-            <View style={{
-                width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 20
-            }}></View>
+            ))}
+
+
         </View>
     )
 
     return (
+
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
             <View style={styles.purple}>
 
@@ -51,19 +128,11 @@ const Blood = ({ navigation }) => {
 
                         <Text style={{ color: "black", fontFamily: 'Mulish-Bold', fontSize: 18, marginTop: 5 }}>Standard Limits</Text>
 
+                        <Text style={{ color: "black", fontFamily: 'Mulish-SemiBold', fontSize: 14, marginTop: 5 }}>{'Systolic :'} {getdata.blood_pressure_systolic}</Text>
+                        <Text style={{ color: "black", fontFamily: 'Mulish-SemiBold', fontSize: 14, marginTop: 5 }}>{'Diastolic :'} {getdata.blood_pressure_diastolic}</Text>
 
-                        <FlatList
+                        <Text style={{ color: "black", fontFamily: 'Mulish-SemiBold', fontSize: 14, marginTop: 5 }}>{'Pulse Rate :'} {getdata.blood_pressure_pulserate} </Text>
 
-                            data={data}
-                            renderItem={(item) => (
-                                <View style={{ flexDirection: 'row', marginTop: 5 }}>
-                                    <Text style={{
-                                        color: '#4A4A4A'
-                                    }}>{item.item.name}</Text>
-                                    <Text style={{ color: 'black' }}>{item.item.tag}</Text>
-                                </View>
-                            )}
-                        />
 
                     </View>
                 </View>
@@ -78,9 +147,84 @@ const Blood = ({ navigation }) => {
                 </TouchableOpacity>
             </View>
             <FlatList
-                data={today}
+                data={todays}
                 renderItem={Render}
             />
+            <View style={{ alignItems: 'center' }}>
+                <TouchableOpacity
+                    onPress={() => setModalVisible(true)}
+                    style={{
+                        backgroundColor: '#FBF4FF', marginBottom: 20, padding: 17, width: '95%', borderRadius: 30, alignItems: 'center', marginTop: 10
+                    }}>
+                    <Text style={{ color: '#702B92', fontSize: 18, fontFamily: 'Mulish-Bold' }}>ADD NEW</Text>
+                </TouchableOpacity>
+            </View>
+            <Modal
+                isVisible={isModalVisible}
+                style={styles.model}
+            >
+                <View style={{ flex: 1 }}>
+                    <View style={{ alignItems: 'center', marginTop: 25 }}>
+                        <Text style={{ color: 'black', fontFamily: 'Mulish-ExtraBold', fontSize: 18 }}>Blood Pressure Reading</Text>
+                    </View>
+                    <View style={{ marginStart: 15 }}>
+                        <View style={styles.rate}>
+                            <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Systolic (mmHg)</Text>
+                            <View style={{ height: 54, width: 90, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                                <TextInput
+                                    keyboardType='numeric'
+                                    maxLength={4}
+                                    style={{ color: '#4A4A4A', fontFamily: 'Mulish-Bold', fontSize: 18, textAlign: 'center' }}
+                                    onChangeText={(text) => setSystolic(text)} />
+                            </View>
+                        </View>
+                        <View style={{
+                            width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 15
+                        }}>
+
+                        </View>
+                        <View style={styles.rate}>
+                            <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Diastolic (mmHg)</Text>
+                            <View style={{ height: 54, width: 90, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                                <TextInput
+                                    keyboardType='numeric'
+                                    maxLength={4}
+                                    style={{ color: '#4A4A4A', fontFamily: 'Mulish-Bold', fontSize: 18, textAlign: 'center' }}
+                                    onChangeText={(text) => setDiastolic(text)}
+                                />
+                            </View>
+                        </View>
+                        <View style={{
+                            width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 15
+                        }}>
+
+                        </View>
+                        <View style={styles.rate}>
+                            <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Pulse Rate (mmHg)</Text>
+                            <View style={{ height: 54, width: 90, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                                <TextInput
+                                    keyboardType='numeric'
+                                    maxLength={4}
+                                    style={{ color: '#4A4A4A', fontFamily: 'Mulish-Bold', fontSize: 18, textAlign: 'center' }}
+                                    onChangeText={(text) => setPulse(text)}
+                                />
+                            </View>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 40 }}>
+                            <TouchableOpacity
+                                onPress={() => { setModalVisible(false) }}
+                                style={{ borderWidth: 0.5, borderColor: '#4A4A4A', width: '45%', padding: 15, borderRadius: 30, alignItems: 'center' }}>
+                                <Text style={{ color: '#702B92', fontFamily: 'Mulish-Bold' }}>CANCLE</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={save}
+                                style={{ backgroundColor: '#702B92', width: '45%', padding: 15, borderRadius: 30, marginStart: 10, alignItems: "center" }}>
+                                <Text style={{ color: 'white', fontFamily: 'Mulish-Bold' }}>SAVE</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     )
 }
@@ -101,55 +245,14 @@ const styles = StyleSheet.create({
     avg: { backgroundColor: '#FBF4FF', width: '46%', marginTop: 10, padding: 10, borderRadius: 15 },
     std: { backgroundColor: '#F5F5F5', width: '45%', marginTop: 10, padding: 10, borderRadius: 15, marginStart: 10 },
     today: { marginTop: 20, flexDirection: 'row', alignItems: 'center', width: '96%', justifyContent: 'space-between' },
+    rate: { flexDirection: 'row', marginTop: 15, width: '95%', justifyContent: 'space-between', alignItems: 'center' },
+
+    model: {
+        position: 'absolute', backgroundColor: 'white', width: '100%', height: '50%', marginStart: 0, marginBottom: 0, bottom: 0, borderTopLeftRadius: 40,
+        borderTopRightRadius: 40
+    },
+
 })
 
-const data = [
-    {
-        id: 1,
-        name: 'Systolic :',
-        tag: '<120 mmHg'
-    },
-    {
-        id: 2,
-        name: 'Diastolic :',
-        tag: '<80 mmHg'
-    },
-    {
-        id: 3,
-        name: 'Pulse Rate :',
-        tag: '70 bpm'
-    },
-]
 
-const today = [
-    {
-        id: 1,
-        name: 'Systolic :',
-        tag: '<80 mmHg',
-        name1: 'Diastolic :',
-        tag1: '<120  mmHg',
-        name2: 'Pulse Rate :',
-        tag2: '70 bpm',
-        time: '05.30 AM'
-    },
-    {
-        id: 2,
-        name: 'Systolic :',
-        tag: '<100 mmHg',
-        name1: 'Diastolic :',
-        tag1: '<100 mmHg',
-        name2: 'Pulse Rate :',
-        tag2: '65 bpm',
-        time: '12.00 PM'
-    },
-    {
-        id: 3,
-        name: 'Systolic :',
-        tag: '<100 mmHg',
-        name1: 'Diastolic :',
-        tag1: '<80 mmHg',
-        name2: 'Pulse Rate :',
-        tag2: '70 bpm',
-        time: '05.30 PM'
-    },
-]
+

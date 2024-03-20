@@ -11,10 +11,10 @@ const LoadingSkeleton = () => {
             renderItem={() => {
                 return (
                     <View style={{ height: 70, width: '100%', alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
-                        <View style={{ backgroundColor: 'lightgray', width: 30, height: 30, borderRadius: 30 }}>
+                        <View style={{ backgroundColor: '#EAEAEA', width: 30, height: 30, borderRadius: 30 }}>
 
                         </View>
-                        <View style={{ backgroundColor: 'lightgray', width: '70%', height: 30, borderRadius: 15, marginStart: 20 }}>
+                        <View style={{ backgroundColor: '#EAEAEA', width: '70%', height: 30, borderRadius: 15, marginStart: 20 }}>
 
                         </View>
 

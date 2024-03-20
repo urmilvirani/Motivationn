@@ -12,6 +12,8 @@ const MoreDetail = ({ route }) => {
     return (
         <View style={{ flex: 1 }}>
             <WebView source={{ uri: route?.params?.data.media }} />
+
+
         </View>
     )
 }

@@ -19,15 +19,21 @@ const Home = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [list, setList] = useState('')
 
-    useFocusEffect(
-        React.useCallback(() => {
-            profile();
-            item()
-            return () => {
-                // Cleanup function (if needed)
-            };
-        }, [])
-    );
+    // useFocusEffect(
+    //     React.useCallback(() => {
+    //         profile();
+    //         item()
+    //         return () => {
+    //             // Cleanup function (if needed)
+    //         };
+    //     }, [])
+    // );
+
+
+    useEffect(() => {
+        profile();
+        item()
+    }, [])
 
 
 
