@@ -5,29 +5,86 @@ import { Plus } from '../assets/svg'
 import { Calander } from '../assets/svg'
 import Modal from "react-native-modal";
 import webservices from '../Navigation/webservices'
+import Metricloader from '../component/Metricloader'
 
-const Food = ({ navigation }) => {
+const Food = ({ navigation }: any) => {
 
+    const [loading, setLoading] = useState('')
 
+    //model
     const [isModalVisible, setModalVisible] = useState(false);
-    const [banana, setBanana] = useState(false);
-    // const [gram, setGram] = useState(false);
-    const [name, setName] = useState(false);
-    // const [quntity, setQuantity] = useState(false);
+    const [gm, setGm] = useState('')
+    const [deletemodal, setDeletemodal] = useState('')
+
+    //textinput
+    const [name, setName] = useState('')
+    const [quantity, setQuantity] = useState('')
+
+    //used for Render(second flat list)
     const [list, setList] = useState('')
 
+    //to show name in bootom seat
+    const [foodie, setFoodie] = useState('')
 
+    //meal_type_id 
+    const [selectedMealTypeId, setSelectedMealTypeId] = useState(null);
+
+    //select kg or gm
+    const [selectkg, setSelectkg] = useState('')
+    const [selectedHeartRateId, setSelectedHeartRateId] = useState('');
 
     useEffect(() => {
 
         food()
+
     }, [])
 
-    const food = async () => {
+
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+
+    const hours = String(currentDate.getHours()).padStart(2, '0');
+    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+    const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+    const dateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    const date = `${day}/${month}/${year}`
+
+    const data = {
+        "datetime": dateTime,
+        "meal_type_id": selectedMealTypeId,
+        "items": [
+            {
+                "food_item": name,
+                "food_value": quantity,
+                "measurement_type_term": selectkg
+            }
+        ]
+    };
+
+
+
+    const save = async () => {
         try {
-            const response = await webservices('food_logging/list', 'POST')
-            console.log(response.data.list);
-            setList(response.data.list)
+            const res = await webservices('food_logging/save', 'POST', data)
+            console.log(res.message);
+
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    const Delete = async () => {
+
+        try {
+
+            const data = new FormData()
+            data.append('food_log_detail_id', selectedHeartRateId)
+            const dele = await webservices('food_logging/delete', 'POST', data)
+            console.log('hello', dele);
 
         }
         catch (error) {
@@ -37,21 +94,45 @@ const Food = ({ navigation }) => {
     }
 
 
+    const food = async () => {
+        try {
+            setLoading(true)
+            const response = await webservices('food_logging/list', 'POST')
+            console.log(response.data.list);
+            setList(response.data.list)
+
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+        finally {
+            setLoading(false)
+        }
+    }
+
+
     const Render = ({ item }) => (
         <View style={{ marginStart: 15 }}>
-            <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 18, marginTop: 20 }}> {item.date}</Text>
+            <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 18, marginTop: 20, }}> {item.date}</Text>
             {item.list.map((date, i) => (
                 <View key={i} style={{ justifyContent: "space-between", marginTop: 10, }}>
-                    <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 18, }}>{date.title}</Text>
+                    {date.items && date.items.length > 0 ? (<Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 18, }}>{date.title}</Text>) : null}
 
                     {date.items.map((data, index) => (
-                        <View key={index} style={{ marginTop: 10 }}>
+                        <TouchableOpacity
+                            onPress={() => {
+
+                                setSelectedHeartRateId(data.food_log_detail_id)
+                                setDeletemodal(true)
+                            }}
+                            key={index} style={{ marginTop: 10 }}>
                             <Text style={{ color: 'black' }}>{'Food Item :'} {data.food_item}</Text>
-                            <Text style={{ color: 'black' }}>{'Quantity :'} {data.food_item_value}{'gm'}</Text>
+                            <Text style={{ color: 'black' }}>{'Quantity :'} {data.food_item_value} {data.measurement_type_term}</Text>
                             <View style={{
                                 width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 10
                             }}></View>
-                        </View>
+                        </TouchableOpacity>
                     ))}
 
 
@@ -59,40 +140,35 @@ const Food = ({ navigation }) => {
         </View>
     )
 
-    const Lunch = ({ item }) => (
-        <View>
-            <View style={{ flexDirection: 'row', width: '92%', justifyContent: "space-between", marginTop: 10 }}>
-                <View>
-                    <Text style={{ color: 'black' }}>{'Food item :'} {item.item}</Text>
-                    <Text style={{ color: 'black', marginTop: 5 }}>{'Quantity :'} {item.quantity}</Text>
-                </View>
-                <Text style={{ color: 'black' }}>{item.time}</Text>
-            </View>
-
+    const render = ({ item }) => (
+        <View style={{ alignItems: "center" }}>
+            <TouchableOpacity
+                onPress={() => {
+                    setFoodie(item.name)
+                    setSelectedMealTypeId(item.id);
+                    setModalVisible(true)
+                }}
+                style={styles.break}>
+                <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, width: '95%' }}>{item.name}</Text>
+                <Plus />
+            </TouchableOpacity>
         </View>
     )
 
-    const Dinner = ({ item }) => (
+    const weightdata = ({ item }) => (
         <View>
-            <View style={{ flexDirection: 'row', width: '92%', justifyContent: "space-between", marginTop: 10 }}>
-                <View>
-                    <Text style={{ color: 'black' }}>{'Food item :'} {item.item}</Text>
-                    <Text style={{ color: 'black', marginTop: 5 }}>{'Quantity :'} {item.quantity}</Text>
-                </View>
-                <Text style={{ color: 'black' }}>{item.time}</Text>
-            </View>
-            <View style={{ width: '92%', height: 1, backgroundColor: 'lightgray', marginTop: 10 }}></View>
+            <TouchableOpacity onPress={() => {
+                setSelectkg(item.name)
+                setGm(false)
+            }}>
+                <Text style={{ color: 'black', fontSize: 20, fontFamily: 'Mulish-Bold', marginTop: 5 }}>{item.name}</Text>
+            </TouchableOpacity>
         </View>
     )
 
 
-    const Touch = () => {
 
-        setBanana(current => !current);
-        setName(current => !current);
-        setBanana(true)
-        setName(true)
-    }
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
@@ -111,136 +187,85 @@ const Food = ({ navigation }) => {
 
                 </View>
             </View>
-            <View style={{ alignItems: "center" }}>
-                <TouchableOpacity
-                    onPress={() => setModalVisible(true)}
 
-                    style={styles.break}>
-                    <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, width: '95%' }}>Breakfast</Text>
-                    <Plus />
-                </TouchableOpacity>
-                <View style={styles.dinner}>
-                    <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, width: '95%' }}>Lunch</Text>
-                    <Plus />
-                </View>
-                <View style={styles.dinner}>
-                    <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, width: '95%' }}>Dinner</Text>
-                    <Plus />
-                </View>
+            <View>
+                <FlatList
+                    data={listt}
+                    renderItem={render}
 
+                />
             </View>
 
-            {/* <ScrollView style={styles.scroll}> */}
-
-            <FlatList
-                data={list}
-                renderItem={Render}
-            />
-            {/* <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, marginTop: 10 }}>Lunch</Text> */}
-            {/* <FlatList
-                data={lunch}
-                renderItem={Lunch}
-            />
-            <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, marginTop: 10 }}>Dinner</Text>
-            <FlatList
-                data={dinner}
-                renderItem={Dinner}
-            />
-            <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 18, marginTop: 15 }}>Yesterday</Text>
-            <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, marginTop: 10 }}>Breakfast</Text>
-            <FlatList
-                data={Breakfast}
-                renderItem={Render}
-            />
-            <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, marginTop: 10 }}>Lunch</Text>
-            <FlatList
-                data={lunch}
-                renderItem={Lunch}
-            />
-            <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, marginTop: 10 }}>Dinner</Text>
-            <FlatList
-                data={dinner}
-                renderItem={Dinner}
-            />
-            <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 18, marginTop: 15 }}>08-16-2023</Text>
-            <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, marginTop: 10 }}>Breakfast</Text>
-            <FlatList
-                data={Breakfast}
-                renderItem={Render}
-            />
-            <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, marginTop: 10 }}>Lunch</Text>
-            <FlatList
-                data={lunch}
-                renderItem={Lunch}
-            />
-            <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, marginTop: 10 }}>Dinner</Text>
-            <FlatList
-                data={dinner}
-                renderItem={Dinner}
-            /> */}
-            {/* </ScrollView> */}
+            {loading ? (<Metricloader />)
+                :
+                (<FlatList
+                    data={list}
+                    renderItem={Render}
+                />
+                )}
 
             <Modal
                 isVisible={isModalVisible}
                 style={styles.modal}
+
+
             >
                 <View style={{ flex: 1 }}>
 
 
-                    <View style={{ marginTop: 20, flexDirection: "row", alignItems: 'center' }}>
-                        <View style={{ width: "35%" }}></View>
-                        <Text style={{ color: 'black', fontSize: 18, fontFamily: "Mulish-ExtraBold", width: '40%' }}>Add Breakfast</Text>
-                        <TouchableOpacity
-                            onPress={Touch}
-                            style={{
-                                flexDirection: 'row', alignItems: "center", backgroundColor: '#FBF4FF', padding: 8, borderRadius: 20, width: '21%', justifyContent: "center"
-                            }}>
-                            <Plus />
-                            <Text style={{ color: '#702B92', fontFamily: 'Mulish-Bold' }}>ADD</Text>
-                        </TouchableOpacity>
+                    <View style={{ marginTop: 20, alignItems: "center" }}>
+
+                        <Text style={{ color: 'black', fontSize: 18, fontFamily: "Mulish-ExtraBold", width: '40%', textAlign: 'center' }}>{foodie}</Text>
+
                     </View>
-                    <View style={{ flexDirection: 'row', marginStart: 15, marginTop: 10 }}>
-                        <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 18, width: '17%' }}>Today</Text>
+                    <View
+
+                        // onPress={() => setDatevisible(true)}
+                        style={{ flexDirection: 'row', marginStart: 15, marginTop: 10 }}>
+                        <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 18, width: '30%' }}>{date}</Text>
                         <Calander />
                     </View>
-                    <ScrollView>
-                        <View style={{ alignItems: "center", marginTop: 10 }}>
-                            <TextInput
 
-                                // onChangeText={(text) => setBanana(text)}
-                                placeholder='Banana'
-                                placeholderTextColor={'black'}
-                                style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '92%', borderRadius: 10, padding: 10 }}
-                            />
+                    <View style={{ alignItems: "center", marginTop: 20 }}>
+                        <TextInput
+                            onChangeText={(text) => setName(text)}
+
+                            placeholder='Banana'
+                            placeholderTextColor={'black'}
+                            style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '92%', borderRadius: 10, padding: 10, color: 'black' }}
+                        />
+                        <View style={{ flexDirection: 'row' }}>
                             <TextInput
+                                onChangeText={(text) => setQuantity(text)}
+                                keyboardType='numeric'
                                 placeholder='250 gm'
                                 placeholderTextColor={'black'}
-                                style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '92%', borderRadius: 10, marginTop: 10, padding: 10 }}
+                                style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '70%', borderRadius: 10, marginTop: 10, padding: 10, color: 'black' }}
                             />
-                            {banana && <TextInput
-                                placeholder='Food item name'
-                                placeholderTextColor={'black'}
-                                style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '92%', borderRadius: 10, marginTop: 10, padding: 10 }}
-                            />}
-                            {name && <TextInput
-                                placeholder='Quantity (gm/kg)'
-                                placeholderTextColor={'black'}
-                                style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '92%', borderRadius: 10, marginTop: 10, padding: 10 }}
-                            />}
-
-
-
+                            <TouchableOpacity
+                                onPress={() => setGm(true)}
+                                style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '20%', borderRadius: 10, marginTop: 10, padding: 10, alignItems: "center", justifyContent: "center", marginStart: 10 }}>
+                                {selectkg ? (<Text style={{ color: 'black', fontSize: 18, fontFamily: 'Mulish-Bold' }}>{selectkg}</Text>)
+                                    : (<Text style={{ color: 'black', fontSize: 18, fontFamily: 'Mulish-Bold' }}>GM</Text>)}
+                            </TouchableOpacity>
                         </View>
-                    </ScrollView>
+
+
+
+                    </View>
+
                     <View style={{ alignItems: "center" }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 40 }}>
                             <TouchableOpacity
                                 onPress={() => { setModalVisible(false) }}
                                 style={{ borderWidth: 0.5, borderColor: '#4A4A4A', width: '45%', padding: 15, borderRadius: 30, alignItems: 'center' }}>
                                 <Text style={{ color: '#702B92', fontFamily: 'Mulish-Bold' }}>CANCLE</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                onPress={() => { setModalVisible(false) }}
+                                onPress={() => {
+                                    save()
+                                    setModalVisible(false)
+                                }}
                                 style={{ backgroundColor: '#702B92', width: '45%', padding: 15, borderRadius: 30, marginStart: 10, alignItems: "center" }}>
                                 <Text style={{ color: 'white', fontFamily: 'Mulish-Bold' }}>SAVE</Text>
                             </TouchableOpacity>
@@ -249,7 +274,66 @@ const Food = ({ navigation }) => {
                 </View>
             </Modal>
 
-        </SafeAreaView>
+            <Modal
+
+                isVisible={gm}
+                backdropOpacity={0}
+                style={{
+                    position: 'absolute',
+                    height: '87%',
+                    width: '93%',
+                    justifyContent: "flex-end",
+                    marginStart: 15,
+                    alignItems: "flex-end"
+                }}
+
+            >
+                <View style={{ backgroundColor: '#FBF4FF', height: '10.50%', width: '22%', alignItems: "center", borderRadius: 10 }}>
+                    {/* <TouchableOpacity onPress={() => setGm(false)}>
+                        <Text style={{ color: 'black', fontSize: 20, fontFamily: 'Mulish-Bold', marginTop: 5 }}>GM</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setGm(false)}>
+                        <Text style={{ color: 'black', fontSize: 20, fontFamily: 'Mulish-Bold', marginTop: 10 }}>KG</Text>
+                    </TouchableOpacity> */}
+                    <FlatList
+                        data={weight}
+                        renderItem={weightdata}
+                    />
+                </View>
+            </Modal>
+
+            <Modal isVisible={deletemodal} style={styles.model}>
+                <View style={{ flex: 1 }}>
+                    <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, textAlign: 'center', marginTop: 5 }}>
+                        Delete !!
+                    </Text>
+                    <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, textAlign: 'center', marginTop: 5 }}>
+                        Are you sure you want to Delete?
+                    </Text>
+                    <View style={{ flexDirection: 'row', marginTop: 8, justifyContent: "center" }}>
+                        <TouchableOpacity
+                            onPress={() => setDeletemodal(false)}
+                            style={{ width: '40%', borderWidth: 1, padding: 8, backgroundColor: 'white', borderRadius: 10 }}>
+                            <Text style={{ color: 'black', textAlign: "center" }}> Cancle</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+
+                            onPress={() => {
+
+                                Delete()
+                                setDeletemodal(false)
+                            }}
+                            style={{ width: '40%', borderWidth: 1, padding: 8, backgroundColor: 'black', marginStart: 20, borderRadius: 10 }}>
+                            <Text style={{ color: 'white', textAlign: 'center' }}> Delete</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                </View>
+
+            </Modal>
+
+
+        </SafeAreaView >
     )
 }
 
@@ -268,29 +352,33 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
 
-    dinner: {
-        flexDirection: "row",
-        backgroundColor: '#FBF4FF',
-        width: '92%',
-        padding: 17,
-        borderRadius: 15,
-        marginTop: 10
-    },
-
     break: {
         flexDirection: "row",
         backgroundColor: '#FBF4FF',
-        width: '92%',
+        width: '95%',
         padding: 17,
         borderRadius: 15,
-        marginTop: 20
+        marginTop: 10,
+
+
     },
 
     scroll: { marginStart: 15, marginTop: 15 },
     modal: {
         position: 'absolute',
         backgroundColor: 'white',
-        height: '60%',
+        height: '39%',
+        width: '100%',
+        marginStart: 0,
+        bottom: 0,
+        marginBottom: 0,
+        borderTopLeftRadius: 40,
+        borderTopRightRadius: 40
+    },
+    model: {
+        position: 'absolute',
+        backgroundColor: '#FBF4FF',
+        height: '13%',
         width: '100%',
         marginStart: 0,
         bottom: 0,
@@ -300,50 +388,94 @@ const styles = StyleSheet.create({
     }
 })
 
-const Breakfast = [
+const listt = [
+    {
+        id: 28,
+        name: 'Breakfast'
+    },
+    {
+        id: 54,
+        name: 'Breakfast Snack'
+    },
+    {
+        id: 55,
+        name: 'Lunch'
+    },
+    {
+        id: 56,
+        name: 'Lunch Snack'
+    },
+    {
+        id: 57,
+        name: 'Dinner'
+    },
+    {
+        id: 58,
+        name: 'Dinner Snack'
+    },
+]
+
+const weight = [
     {
         id: 1,
-
-        item: 'Banana',
-        quantity: '250 gm',
-        time: '09:00 AM'
+        name: 'GM'
     },
     {
         id: 2,
-
-        item: 'Apple',
-        quantity: '100 gm',
-        time: '09:15 AM'
-    },
-
+        name: 'KG'
+    }
 ]
 
-const lunch = [
-    {
-        id: 1,
-
-        item: 'Rice',
-        quantity: '250 gm',
-        time: '01:15 PM'
-    },
 
 
-]
 
-const dinner = [
-    {
-        id: 1,
+// const calculateLastFiveDates = () => {
 
-        item: 'Rice',
-        quantity: '150 gm',
-        time: '08:30 PM'
-    },
-    {
-        id: 2,
 
-        item: 'Fruits',
-        quantity: '200 gm',
-        time: '08:30 PM'
-    },
+//     const today = new Date();
+//     const dates = [];
+//     for (let i = 0; i < 5; i++) {
+//         const date = new Date(today);
+//         date.setDate(today.getDate() - i);
+//         const year = date.getFullYear();
+//         const month = String(date.getMonth() + 1).padStart(2, '0');
+//         const day = String(date.getDate()).padStart(2, '0');
+//         dates.push({ date: `${year}-${month}-${day}`, year, month, day });
+//     }
+//     // setLastFiveDates(dates);
 
-]
+// }; 
+
+{/* <Modal
+                isVisible={datevisible}
+                backdropOpacity={0}
+                style={{
+                    position: 'absolute',
+                    height: '87%',
+                    width: '35%',
+                    justifyContent: "flex-end",
+                    marginStart: 15
+
+
+
+
+                }} >
+                <View style={{ backgroundColor: '#FBF4FF', borderRadius: 5, alignItems: "center", height: '25%', justifyContent: 'space-between' }}>
+
+                    {lastFiveDates.map((dateObj, index) => (
+                        <TouchableOpacity key={index} onPress={() => {
+                            setDatee(dateObj.date)
+                            setDatevisible(false)
+
+                        }}>
+                            <Text style={{ color: 'black', fontSize: 18, fontFamily: 'Mulish-Bold' }}>{dateObj.date}</Text>
+                        </TouchableOpacity>
+                    ))}
+
+
+
+                </View>
+            </Modal> */}
+const [lastFiveDates, setLastFiveDates] = useState([]);
+const [datevisible, setDatevisible] = useState('')
+const [datee, setDatee] = useState('')

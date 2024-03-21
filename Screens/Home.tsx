@@ -19,19 +19,19 @@ const Home = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [list, setList] = useState('')
 
-    // useFocusEffect(
-    //     React.useCallback(() => {
-    //         profile();
-    //         item()
-    //         return () => {
-    //             // Cleanup function (if needed)
-    //         };
-    //     }, [])
-    // );
+    useFocusEffect(
+        React.useCallback(() => {
+            profile();
+
+            return () => {
+                // Cleanup function (if needed)
+            };
+        }, [])
+    );
 
 
     useEffect(() => {
-        profile();
+
         item()
     }, [])
 
@@ -39,7 +39,7 @@ const Home = ({ navigation }) => {
 
     const profile = async () => {
         try {
-            setLoading(true);
+
             const namee = await webservices('get_user_profile', 'POST', data)
 
             console.log('jjjjjjjjjjjjjjjjjjjjjjj', namee.data.user.profile_pic);
@@ -51,15 +51,16 @@ const Home = ({ navigation }) => {
             console.log(error);
 
         }
-        finally {
-            setLoading(false); // Hide loader
-        }
+        // finally {
+        //     setLoading(false); // Hide loader
+        // }
     }
 
 
     const item = async () => {
         try {
-            const items = await webservices('category/get_categories', 'POST', data)
+            setLoading(true)
+            const items = await webservices('category/get_categories', 'POST')
 
             const dataa = items.data.list
             setList(dataa)
@@ -69,6 +70,9 @@ const Home = ({ navigation }) => {
             console.log(error);
 
 
+        }
+        finally {
+            setLoading(false)
         }
     }
 

@@ -115,6 +115,8 @@ const Heartrate = ({ navigation }) => {
     }
 
 
+
+
     const Render = ({ item }: any) => (
 
         <View>

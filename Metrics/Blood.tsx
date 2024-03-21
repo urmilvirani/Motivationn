@@ -122,7 +122,7 @@ const Blood = ({ navigation }: any) => {
                             <Text style={{ color: "black", width: '76%', fontFamily: 'Mulish-Bold', fontSize: 18 }}>Average BP</Text>
                             <Image source={require('../assets/image/Heartbreake.png')} style={{ width: 40, height: 40 }} />
                         </View>
-                        <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 35, marginTop: 20 }}>120/80</Text>
+                        <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 28, marginTop: 20 }}>{getdata.average_systolic}/{getdata.average_diastolic}</Text>
                     </View>
                     <View style={styles.std}>
 

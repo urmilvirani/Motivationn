@@ -3,11 +3,14 @@ import React, { useEffect, useState } from 'react'
 import { Leftarrow } from '../assets/svg'
 import webservices from '../Navigation/webservices';
 import Metricloader from '../component/Metricloader';
+import Modal from "react-native-modal";
 
 const Heartdata = ({ navigation }: any) => {
 
     const [pulse, setPulse] = useState('')
     const [loading, setLoading] = useState('')
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [selectedHeartRateId, setSelectedHeartRateId] = useState('');
 
     useEffect(() => {
         heart()
@@ -30,18 +33,44 @@ const Heartdata = ({ navigation }: any) => {
         }
     }
 
+    const Delete = async () => {
+
+        try {
+
+            const data = new FormData()
+            data.append('heart_rate_id', selectedHeartRateId)
+            const dele = await webservices('heart_rate/delete', 'POST', data)
+            console.log('hello', dele);
+
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+    }
+
     const Render = ({ item }: any) => (
         <View style={{ marginStart: 15, }}>
             <Text style={styles.today}>{item.date}</Text>
 
             {item.list.map((heartData, index) => (
                 <View key={index}>
-                    <View style={{ flexDirection: 'row', width: '95%', justifyContent: 'space-between', marginTop: 10 }}>
+                    <TouchableOpacity
+                        onPress={() => {
+
+                            setSelectedHeartRateId(heartData.heart_rate_id);
+                            setModalVisible(true)
+                        }}
+                        style={{ flexDirection: 'row', width: '95%', justifyContent: 'space-between', marginTop: 10 }}>
                         <Text style={{ color: 'black', fontSize: 16, fontFamily: 'Mulish-Regular' }}>{'Pulse rate: '} {heartData.pulse_rate}</Text>
                         {/* <Text style={{ color: '#4A4A4A', fontSize: 14, fontFamily: 'Mulish-Regular' }}>{heartData.datetime}</Text> */}
-                    </View><View style={{
+                    </TouchableOpacity>
+
+
+                    <View style={{
                         width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 10
                     }}></View>
+
                 </View>
             ))}
 
@@ -50,7 +79,7 @@ const Heartdata = ({ navigation }: any) => {
 
 
 
-    const [isModalVisible, setModalVisible] = useState(false);
+
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
@@ -79,6 +108,36 @@ const Heartdata = ({ navigation }: any) => {
                 />
             </View>}
 
+            <Modal isVisible={isModalVisible} style={styles.modal}>
+                <View style={{ flex: 1 }}>
+                    <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, textAlign: 'center', marginTop: 5 }}>
+                        Delete !!
+                    </Text>
+                    <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, textAlign: 'center', marginTop: 5 }}>
+                        Are you sure you want to Delete?
+                    </Text>
+                    <View style={{ flexDirection: 'row', marginTop: 8, justifyContent: "center" }}>
+                        <TouchableOpacity
+                            onPress={() => setModalVisible(false)}
+                            style={{ width: '40%', borderWidth: 1, padding: 8, backgroundColor: 'white', borderRadius: 10 }}>
+                            <Text style={{ color: 'black', textAlign: "center" }}> Cancle</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+
+                            onPress={() => {
+
+                                Delete()
+                                setModalVisible(false)
+                            }}
+                            style={{ width: '40%', borderWidth: 1, padding: 8, backgroundColor: 'black', marginStart: 20, borderRadius: 10 }}>
+                            <Text style={{ color: 'white', textAlign: 'center' }}> Delete</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                </View>
+
+            </Modal>
+
 
 
         </SafeAreaView>
@@ -105,91 +164,18 @@ const styles = StyleSheet.create({
     bottom: { flexDirection: 'row', marginTop: 20, width: '95%', justifyContent: 'space-between' },
     rate: { flexDirection: 'row', marginTop: 20, width: '95%', justifyContent: 'space-between', alignItems: 'center' },
 
-    model: {
-        position: 'absolute', backgroundColor: 'white', width: '100%', height: '50%', marginStart: 0, marginBottom: 0, bottom: 0, borderTopLeftRadius: 40,
+    modal: {
+        position: 'absolute',
+        backgroundColor: '#FBF4FF',
+        height: '13%',
+        width: '100%',
+        marginStart: 0,
+        bottom: 0,
+        marginBottom: 0,
+        borderTopLeftRadius: 40,
         borderTopRightRadius: 40
-    },
+    }
 })
-
-const today = [
-    {
-        id: 1,
-        name: '72 bpm',
-        time: '03.30 PM'
-    },
-    {
-        id: 2,
-        name: '71 bpm',
-        time: '01.15 PM'
-    },
-    {
-        id: 3,
-        name: '70 bpm',
-        time: '12.16 PM'
-    },
-    {
-        id: 4,
-        name: '80 bpm',
-        time: '12.00 PM'
-    },
-    {
-        id: 5,
-        name: '85 bpm',
-        time: '11.00 AM'
-    },
-    {
-        id: 6,
-        name: '95 bpm',
-        time: '10.30 PM'
-    },
-]
-
-const yesterday = [
-    {
-        id: 1,
-        name: '72 bpm',
-        time: '03.30 PM'
-    },
-    {
-        id: 2,
-        name: '71 bpm',
-        time: '01.15 PM'
-    },
-    {
-        id: 3,
-        name: '70 bpm',
-        time: '12.16 PM'
-    },
-    {
-        id: 4,
-        name: '80 bpm',
-        time: '12.00 PM'
-    },
-
-]
-
-const dome = [
-    {
-        id: 1,
-        name: '72 bpm',
-        time: '03.30 PM'
-    },
-    {
-        id: 2,
-        name: '71 bpm',
-        time: '01.15 PM'
-    },
-    {
-        id: 3,
-        name: '70 bpm',
-        time: '12.16 PM'
-    },
-    {
-        id: 4,
-        name: '80 bpm',
-        time: '12.00 PM'
-    },
-]
 
 
 // const formattedDate = selectedDate.toLocaleDateString();

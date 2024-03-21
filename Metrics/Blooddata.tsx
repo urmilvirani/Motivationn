@@ -2,11 +2,15 @@ import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image
 import React, { useEffect, useState } from 'react'
 import { Leftarrow } from '../assets/svg'
 import webservices from '../Navigation/webservices'
-
+import Modal from "react-native-modal";
+import Metricloader from '../component/Metricloader';
 
 const Blooddata = ({ navigation }: any) => {
 
     const [list, setList] = useState('')
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [selectedHeartRateId, setSelectedHeartRateId] = useState('');
+    const [loading, setLoading] = useState('')
 
     useEffect(() => {
 
@@ -15,11 +19,31 @@ const Blooddata = ({ navigation }: any) => {
 
     const Data = async () => {
         try {
-
+            setLoading(true)
             const response = await webservices('blood_pressure/list', 'POST')
             console.log(response.data.list);
 
             setList(response?.data?.list)
+
+        }
+        catch (error) {
+            console.log(error);
+
+        }
+        finally {
+            setLoading(false)
+        }
+    }
+
+
+    const Delete = async () => {
+
+        try {
+
+            const data = new FormData()
+            data.append('blood_pressure_id', selectedHeartRateId)
+            const dele = await webservices('blood_pressure/delete', 'POST', data)
+            console.log('hello', dele);
 
         }
         catch (error) {
@@ -35,7 +59,14 @@ const Blooddata = ({ navigation }: any) => {
             <Text style={styles.today}>{item.date}</Text>
             {item.list.map((heartData, index) => (
                 <View key={index}>
-                    <View style={{ width: '95%', marginTop: 10 }}>
+                    <TouchableOpacity
+
+                        onPress={() => {
+
+                            setSelectedHeartRateId(heartData.blood_pressure_id);
+                            setModalVisible(true)
+                        }}
+                        style={{ width: '95%', marginTop: 10 }}>
                         {heartData.reading_details.map((detail, i) => (
                             <View key={i}>
                                 <View style={{ flexDirection: 'row' }}>
@@ -50,7 +81,7 @@ const Blooddata = ({ navigation }: any) => {
                             width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 15
                         }}></View>
 
-                    </View>
+                    </TouchableOpacity>
 
                 </View>
             ))}
@@ -81,12 +112,44 @@ const Blooddata = ({ navigation }: any) => {
                 </View>
             </View>
 
-            <View>
-                <FlatList
-                    data={list}
-                    renderItem={Render}
-                />
-            </View>
+            {loading ? (<Metricloader />)
+                :
+                (<View>
+                    <FlatList
+                        data={list}
+                        renderItem={Render}
+                    />
+                </View>
+                )}
+            <Modal isVisible={isModalVisible} style={styles.modal}>
+                <View style={{ flex: 1 }}>
+                    <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, textAlign: 'center', marginTop: 5 }}>
+                        Delete !!
+                    </Text>
+                    <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, textAlign: 'center', marginTop: 5 }}>
+                        Are you sure you want to Delete?
+                    </Text>
+                    <View style={{ flexDirection: 'row', marginTop: 8, justifyContent: "center" }}>
+                        <TouchableOpacity
+                            onPress={() => setModalVisible(false)}
+                            style={{ width: '40%', borderWidth: 1, padding: 8, backgroundColor: 'white', borderRadius: 10 }}>
+                            <Text style={{ color: 'black', textAlign: "center" }}> Cancle</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+
+                            onPress={() => {
+
+                                Delete()
+                                setModalVisible(false)
+                            }}
+                            style={{ width: '40%', borderWidth: 1, padding: 8, backgroundColor: 'black', marginStart: 20, borderRadius: 10 }}>
+                            <Text style={{ color: 'white', textAlign: 'center' }}> Delete</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                </View>
+
+            </Modal>
 
         </SafeAreaView>
     )
@@ -112,9 +175,16 @@ const styles = StyleSheet.create({
     bottom: { flexDirection: 'row', marginTop: 20, width: '95%', justifyContent: 'space-between' },
     rate: { flexDirection: 'row', marginTop: 15, width: '95%', justifyContent: 'space-between', alignItems: 'center' },
 
-    model: {
-        position: 'absolute', backgroundColor: 'white', width: '100%', height: '50%', marginStart: 0, marginBottom: 0, bottom: 0, borderTopLeftRadius: 40,
+    modal: {
+        position: 'absolute',
+        backgroundColor: '#FBF4FF',
+        height: '13%',
+        width: '100%',
+        marginStart: 0,
+        bottom: 0,
+        marginBottom: 0,
+        borderTopLeftRadius: 40,
         borderTopRightRadius: 40
-    },
+    }
 })
 

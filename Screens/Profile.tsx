@@ -7,6 +7,7 @@ import WebView from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import webservices from '../Navigation/webservices';
 import { useFocusEffect } from '@react-navigation/native';
+import Ploder from '../component/Ploder';
 
 const Profile = ({ navigation }) => {
 
@@ -23,6 +24,7 @@ const Profile = ({ navigation }) => {
             };
         }, [])
     );
+
 
 
     const profile = async () => {
@@ -81,7 +83,7 @@ const Profile = ({ navigation }) => {
                         width: 350, height: 1, backgroundColor: "rgba(234, 234, 234, 1)",
                     }}></View>
                 </View>
-                <View style={{ flexDirection: "row" }}>
+                {loading ? (<Ploder />) : (<View style={{ flexDirection: "row" }}>
 
                     {user.profile_pic ?
                         (<Image source={{ uri: user.profile_pic }} style={{ width: 100, height: 100, backgroundColor: 'gray', marginTop: 15, marginStart: 15, borderRadius: 15 }} />)
@@ -93,15 +95,12 @@ const Profile = ({ navigation }) => {
                         )
                     }
 
-                    {loading ? (<View style={{ marginStart: 50, marginTop: 20 }}>
-                        <ActivityIndicator size='large' color='white' />
-                    </View>)
-                        :
-                        (<View style={{ margin: 15 }}>
-                            <Text style={{ color: "white", fontSize: 16, fontFamily: 'Mulish-Bold' }}>{user.first_name} {user.last_name}</Text>
-                            <Text style={{ color: "white", fontSize: 14, fontFamily: 'Mulish-Regular' }}>{user.email}</Text>
-                        </View>)}
-                </View>
+
+                    <View style={{ margin: 15 }}>
+                        <Text style={{ color: "white", fontSize: 16, fontFamily: 'Mulish-Bold' }}>{user.first_name} {user.last_name}</Text>
+                        <Text style={{ color: "white", fontSize: 14, fontFamily: 'Mulish-Regular' }}>{user.email}</Text>
+                    </View>
+                </View>)}
             </View>
             <View style={{ height: '80%', justifyContent: "flex-end", bottom: 30 }}>
                 <TouchableOpacity style={styles.delete}>
@@ -120,7 +119,7 @@ const Profile = ({ navigation }) => {
                 </TouchableOpacity>
             </View>
 
-        </SafeAreaView>
+        </SafeAreaView >
     )
 }
 
