@@ -4,6 +4,7 @@ import { Leftarrow } from '../assets/svg'
 import Modal from "react-native-modal";
 import webservices from '../Navigation/webservices';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import Metricloader from '../component/Metricloader';
 
 
 const Weight = ({ navigation }) => {
@@ -15,6 +16,7 @@ const Weight = ({ navigation }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
     const [selectedTime, setSelectedTime] = useState(new Date());
+    const [loading, setLoading] = useState('')
 
 
     const showDatePicker = () => {
@@ -51,6 +53,7 @@ const Weight = ({ navigation }) => {
 
     const weightapi = async () => {
         try {
+            setLoading(true)
             const heart = await webservices('weight_measurement/get_details', 'POST')
             console.log(heart.data);
             setGet(heart.data)
@@ -70,6 +73,9 @@ const Weight = ({ navigation }) => {
         catch (error) {
             console.log(error);
 
+        }
+        finally {
+            setLoading(false)
         }
     }
 
@@ -95,6 +101,7 @@ const Weight = ({ navigation }) => {
             const save = await webservices('weight_measurement/save', "POST", data)
             console.log('saved', save.message);
             // setPulse(save)
+            setModalVisible(false)
 
         }
         catch (error) {
@@ -165,10 +172,11 @@ const Weight = ({ navigation }) => {
                 </TouchableOpacity>
             </View>
 
-            <FlatList
-                data={todays}
-                renderItem={Render}
-            />
+            {loading ? (<Metricloader />)
+                : (<FlatList
+                    data={todays}
+                    renderItem={Render}
+                />)}
             <View style={{ alignItems: 'center' }}>
                 <TouchableOpacity
                     onPress={() => { setModalVisible(true) }}

@@ -106,6 +106,7 @@ const Heartrate = ({ navigation }) => {
             const save = await webservices('heart_rate/save', "POST", data)
             console.log('saved', save.message);
             // setPulse(save)
+            setModalVisible(false)
 
         }
         catch (error) {

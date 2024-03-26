@@ -221,15 +221,17 @@ const Home = ({ navigation }) => {
 
                 <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                     <TouchableOpacity
-
+                        onPress={() => navigation.navigate('Callback')}
                         style={styles.request}>
                         <Image source={require('../assets/image/phone.png')} style={{ width: 24, height: 24 }} />
                         <Text style={{ color: 'black', marginStart: 10, fontFamily: 'Mulish-Bold' }}>Request Callback</Text>
                     </TouchableOpacity>
-                    <View style={styles.book}>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('Book')}
+                        style={styles.book}>
                         <Image source={require('../assets/image/assessment.png')} style={{ width: 24, height: 24 }} />
                         <Text style={{ color: 'black', marginStart: 10, fontFamily: 'Mulish-Bold' }}>Book Assessment</Text>
-                    </View>
+                    </TouchableOpacity>
                 </View>
             </View>
         </SafeAreaView >

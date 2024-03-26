@@ -73,7 +73,7 @@ const Message = ({ navigation }) => {
             <View style={styles.purple}>
                 <Text style={{ color: "white", fontFamily: 'Mulish-ExtraBold', fontSize: 18 }}>Motivation Centre</Text>
             </View>
-            {/* <Image source={require('../assets/image/Back.png')} style={{ height: '100%', width: '100%', position: 'absolute', }} /> */}
+            <Image source={require('../assets/image/Back.png')} style={{ height: '100%', width: '100%', position: 'absolute', }} />
 
 
             <ScrollView ref={scrollViewRef} style={{ paddingHorizontal: 10, bottom: 15, marginTop: 15 }}>

@@ -28,6 +28,8 @@ import Lendingpage from '../Screens/Splash';
 import MoreDetail from '../Screens/MoreDetail';
 import Pdf from 'react-native-pdf';
 import Pdfview from '../Screens/Pdfview';
+import Callback from '../Screens/Callback';
+import Book from '../Screens/Book';
 
 
 
@@ -58,6 +60,8 @@ const Stackk = () => {
             <Stack.Screen name="Editprofile" component={Editprofile} options={{ headerShown: false }} />
             <Stack.Screen name="MoreDetail" component={MoreDetail} options={{ headerShown: false }} />
             <Stack.Screen name="Pdfview" component={Pdfview} options={{ headerShown: false }} />
+            <Stack.Screen name="Callback" component={Callback} options={{ headerShown: false }} />
+            <Stack.Screen name="Book" component={Book} options={{ headerShown: false }} />
 
 
 

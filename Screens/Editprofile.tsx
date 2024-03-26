@@ -10,6 +10,7 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import ImagePicker from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useFocusEffect } from '@react-navigation/native'
+import Editloader from '../component/Editloader'
 
 const Editprofile = ({ navigation }) => {
 
@@ -46,7 +47,7 @@ const Editprofile = ({ navigation }) => {
 
     const profile = async () => {
         try {
-
+            setLoading(true)
             const profileData = await webservices('get_user_profile', 'POST')
 
             console.log('hiiiii', profileData.data.user.profile_pic);
@@ -58,13 +59,15 @@ const Editprofile = ({ navigation }) => {
             console.log(error);
 
         }
+        finally {
+            setLoading(false)
+        }
     }
 
 
     const editprofile = async () => {
 
         try {
-
 
             const data = new FormData()
 
@@ -100,6 +103,7 @@ const Editprofile = ({ navigation }) => {
             console.log(error);
 
         }
+
 
 
     }
@@ -140,8 +144,10 @@ const Editprofile = ({ navigation }) => {
 
                     </View>
                 </View>
-
-                <View style={{ alignItems: 'center', }}>
+            </View >
+            {loading ? (<Editloader />)
+                :
+                (<View style={{ position: "absolute", width: '100%', alignItems: 'center', height: "35%", justifyContent: "center" }}>
                     <TouchableOpacity
                         onPress={() => setModalVisible(true)}
                         style={{ alignItems: "center", marginTop: 25, height: 150, width: 150, borderRadius: 80 }}>
@@ -160,14 +166,14 @@ const Editprofile = ({ navigation }) => {
 
 
                     </TouchableOpacity>
-                </View>
+                </View>)}
 
 
 
-            </View >
+
 
             <ScrollView>
-                <View style={{ marginTop: 90, alignItems: "center" }}>
+                <View style={{ marginTop: 100, alignItems: "center" }}>
                     <TextInput
                         placeholder={user.first_name}
                         placeholderTextColor={'black'}

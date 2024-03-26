@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Leftarrow } from '../assets/svg'
 import Modal from "react-native-modal";
 import webservices from '../Navigation/webservices';
+import Metricloader from '../component/Metricloader';
 
 
 const Blood = ({ navigation }: any) => {
@@ -14,6 +15,7 @@ const Blood = ({ navigation }: any) => {
     const [diastolic, setDiastolic] = useState('')
     const [pulse, setPulse] = useState('')
     const [isModalVisible, setModalVisible] = useState(false);
+    const [loading, setLoading] = useState('')
 
     useEffect(() => {
         blood()
@@ -21,6 +23,7 @@ const Blood = ({ navigation }: any) => {
     }, [])
     const blood = async () => {
         try {
+            setLoading(true)
             const response = await webservices('blood_pressure/get_details', 'POST')
             console.log(response.data);
             SetGetdata(response?.data)
@@ -33,6 +36,9 @@ const Blood = ({ navigation }: any) => {
         catch (error) {
             console.log(error);
 
+        }
+        finally {
+            setLoading(false)
         }
     }
 
@@ -58,6 +64,7 @@ const Blood = ({ navigation }: any) => {
 
             const res = await webservices('blood_pressure/save', 'POST', data)
             console.log(res);
+            setModalVisible(false)
 
         }
         catch (error) {
@@ -146,10 +153,12 @@ const Blood = ({ navigation }: any) => {
                     <Text style={{ color: '#702B92', fontFamily: 'Mulish-Bold', fontSize: 14 }}>view data</Text>
                 </TouchableOpacity>
             </View>
-            <FlatList
-                data={todays}
-                renderItem={Render}
-            />
+            {loading ? (<Metricloader />)
+                :
+                (<FlatList
+                    data={todays}
+                    renderItem={Render}
+                />)}
             <View style={{ alignItems: 'center' }}>
                 <TouchableOpacity
                     onPress={() => setModalVisible(true)}
