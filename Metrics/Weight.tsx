@@ -5,6 +5,7 @@ import Modal from "react-native-modal";
 import webservices from '../Navigation/webservices';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Metricloader from '../component/Metricloader';
+import Weightinfo from '../Information/Weightinfo';
 
 
 const Weight = ({ navigation }) => {
@@ -151,9 +152,11 @@ const Weight = ({ navigation }) => {
 
 
                 <Text style={{ color: "white", fontFamily: 'Mulish-ExtraBold', fontSize: 18 }}>Weight Logging</Text>
-                <View style={{ width: '10%' }}>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('Weightinfo')}
+                    style={{ width: '10%' }}>
                     <Image source={require('../assets/image/info.jpg')} style={{ width: 20, height: 20 }} />
-                </View>
+                </TouchableOpacity>
             </View>
 
             <View style={styles.avg}>

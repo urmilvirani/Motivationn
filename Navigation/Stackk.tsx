@@ -30,6 +30,9 @@ import Pdf from 'react-native-pdf';
 import Pdfview from '../Screens/Pdfview';
 import Callback from '../Screens/Callback';
 import Book from '../Screens/Book';
+import Heartinfo from '../Information/Heartinfo';
+import Bloodinfo from '../Information/Bloodinfo';
+import Weightinfo from '../Information/Weightinfo';
 
 
 
@@ -62,6 +65,11 @@ const Stackk = () => {
             <Stack.Screen name="Pdfview" component={Pdfview} options={{ headerShown: false }} />
             <Stack.Screen name="Callback" component={Callback} options={{ headerShown: false }} />
             <Stack.Screen name="Book" component={Book} options={{ headerShown: false }} />
+            <Stack.Screen name="Heartinfo" component={Heartinfo} options={{ headerShown: false }} />
+            <Stack.Screen name="Bloodinfo" component={Bloodinfo} options={{ headerShown: false }} />
+            <Stack.Screen name="Weightinfo" component={Weightinfo} options={{ headerShown: false }} />
+
+
 
 
 
