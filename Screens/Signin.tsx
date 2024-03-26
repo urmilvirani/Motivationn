@@ -77,22 +77,25 @@ const Signin = ({ navigation }) => {
 
     const login = async () => {
 
-        // if (!/\S+@\S+\.\S+/.test(email)) {
-        //     setLogemail(true)
-        // }
-        // else {
-        //     setLogemail(false)
-        // }
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            setLogemail(true)
+            return
+        }
+        else {
+            setLogemail(false)
+        }
 
-        // if (pass.length < 6) {
-        //     setLogpass(true)
-        // }
-        // else {
-        //     setLogpass(false)
-        // }
-        // if (!email || !pass) {
-        //     return false
-        // }
+        if (pass.length < 6) {
+            setLogpass(true)
+            return
+        }
+        else {
+            setLogpass(false)
+        }
+        if (!email || !pass) {
+            return false
+        }
+
 
         try {
             const response = await webservices('user_login', 'POST', data)
@@ -121,13 +124,14 @@ const Signin = ({ navigation }) => {
 
         if (!first.trim()) {
             setErrfirst(true)
-
+            return
         }
         else {
             setErrfirst(false)
         }
         if (!last.trim()) {
             setErrlast(true)
+            return
         }
         else {
             setErrlast(false)
@@ -137,6 +141,7 @@ const Signin = ({ navigation }) => {
         if (!/\S+@\S+\.\S+/.test(email)) {
 
             setErremail(true)
+            return
         }
 
         else {
@@ -145,12 +150,14 @@ const Signin = ({ navigation }) => {
 
         if (pass.length < 6) {
             setErrpass(true)
+            return
         }
         else {
             setErrpass(false)
         }
         if (pass !== confirmpass) {
             setErrconfirm(true);
+            return
 
         } else {
             setErrconfirm(false);
@@ -318,7 +325,7 @@ const Signin = ({ navigation }) => {
                             <Eye name={isTextVisible ? 'off' : 'on'} />
                         </TouchableOpacity>
                     </View>
-                    {logpass ? <Text style={{ color: "red" }}>Enter Password*</Text> : null}
+                    {logpass ? <Text style={{ color: "red" }}>Password must be at least 6 characters long*</Text> : null}
 
 
 
@@ -513,8 +520,9 @@ const Signin = ({ navigation }) => {
 
                         </View>
                     </View>
-                    {otperror ? <Text style={{ color: 'red' }}>Please double-check the OTP and try again</Text> : null}
-
+                    <ScrollView>
+                        {otperror ? <Text style={{ color: 'red', textAlign: "center", marginTop: 15 }}>Please double-check the OTP and try again</Text> : null}
+                    </ScrollView>
 
 
                     {/* <View style={{ flexDirection: 'row', alignItems: "center", marginTop: 10 }}>
@@ -524,7 +532,7 @@ const Signin = ({ navigation }) => {
                         </TouchableOpacity>
                     </View> */}
 
-                    <View style={{ alignItems: 'center', marginTop: 30 }}>
+                    <View style={{ alignItems: 'center', bottom: 10 }}>
                         <TouchableOpacity
                             onPress={verify}
                             style={styles.purple}>
