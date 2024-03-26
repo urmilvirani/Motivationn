@@ -132,19 +132,19 @@ const Home = ({ navigation }) => {
                     </View>
 
 
-
-                    <View style={{ alignItems: "center", }}>
-
-                        {list ? <FlatList
-                            data={list}
-                            renderItem={Render}
-                            numColumns={2}
-                        /> : null}
-                    </View>
-
-
-                    <Text style={{ color: 'black', fontSize: 20, fontFamily: 'Mulish-Bold', marginStart: 15, marginTop: 10 }}>Metrics</Text>
                     <ScrollView>
+                        <View style={{ alignItems: "center", }}>
+
+                            {list ? <FlatList
+                                data={list}
+                                renderItem={Render}
+                                numColumns={2}
+                            /> : null}
+                        </View>
+
+
+                        <Text style={{ color: 'black', fontSize: 20, fontFamily: 'Mulish-Bold', marginStart: 15, marginTop: 10 }}>Metrics</Text>
+
                         <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
                             <TouchableOpacity
                                 onPress={() => navigation.navigate('Heartrate')}
@@ -214,6 +214,7 @@ const Home = ({ navigation }) => {
                                 </View>
                             </TouchableOpacity>
                         </View>
+
 
                     </ScrollView>
                 </View>)}

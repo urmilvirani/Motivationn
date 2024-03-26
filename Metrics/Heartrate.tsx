@@ -155,7 +155,7 @@ const Heartrate = ({ navigation }) => {
 
                 <Text style={{ color: "white", fontFamily: 'Mulish-ExtraBold', fontSize: 18 }}>Heart Rate</Text>
                 <View style={{ width: '10%' }}>
-
+                    <Image source={require('../assets/image/info.jpg')} style={{ width: 20, height: 20 }} />
                 </View>
             </View>
 

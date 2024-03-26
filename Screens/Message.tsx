@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Mikee } from '../assets/svg'
 import webservices from '../Navigation/webservices'
 import { useFocusEffect } from '@react-navigation/native'
+import Messageloader from '../component/Messageloader'
 
 
 const Message = ({ navigation }) => {
@@ -10,6 +11,7 @@ const Message = ({ navigation }) => {
     const [text, setText] = useState('')
     const [messages, setMessages] = useState([]);
     const scrollViewRef = useRef();
+    const [loading, setLoading] = useState('')
 
     const data = new FormData()
     data.append('message', text)
@@ -47,6 +49,7 @@ const Message = ({ navigation }) => {
 
     const getChat = async () => {
         try {
+
             const receive = await webservices('chat/get_chat_messages', 'POST')
             console.log(receive.data);
             setMessages(receive.data.list.reverse())
@@ -58,6 +61,7 @@ const Message = ({ navigation }) => {
             console.log(error);
 
         }
+
     }
 
     const formatCreatedAt = (createdAt) => {
@@ -76,15 +80,15 @@ const Message = ({ navigation }) => {
             <Image source={require('../assets/image/Back.png')} style={{ height: '100%', width: '100%', position: 'absolute', }} />
 
 
-            <ScrollView ref={scrollViewRef} style={{ paddingHorizontal: 10, bottom: 15, marginTop: 15 }}>
+            <ScrollView ref={scrollViewRef} style={{ paddingHorizontal: 10, bottom: 15, marginTop: 15, }}>
                 {messages.map((message, index) => (
                     <View key={index}>
                         <View style={[styles.messageContainer, message.sender_id == message.sender_id ? styles.rightMessage : styles.leftMessage]}>
 
                             <Text style={styles.messageText}>{message.message}</Text>
                         </View>
-                        <View style={{ alignItems: message.sender_id == message.sender_id ? 'flex-end' : 'flex-start', marginBottom: 15 }} >
-                            <Text style={{ color: 'gray', fontSize: 12 }}>{formatCreatedAt(message.created_at)}</Text>
+                        <View style={{ alignItems: message.sender_id == message.sender_id ? 'flex-end' : 'flex-start', marginBottom: 10 }} >
+                            <Text style={{ color: 'gray', fontSize: 10 }}>{formatCreatedAt(message.created_at)}</Text>
                         </View>
 
                     </View>
@@ -144,7 +148,7 @@ const styles = StyleSheet.create({
     },
     rightMessage: {
         alignSelf: 'flex-end',
-        backgroundColor: 'rgba(112, 43, 146, 0.8)',
+        backgroundColor: 'rgba(112, 43, 146, 1)',
 
     },
     messageText: {

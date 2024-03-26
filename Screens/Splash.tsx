@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 import { Threearrow } from '../assets/svg'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+
 const Splash = ({ navigation }) => {
 
     useEffect(() => {
@@ -31,6 +32,8 @@ const Splash = ({ navigation }) => {
 
     return (
         <View>
+
+
 
             <View style={styles.line}>
                 <Image source={require('../assets/image/Line.png')} style={{ height: 700, width: 370, }} />
