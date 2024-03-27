@@ -69,6 +69,8 @@ const Signin = ({ navigation }) => {
 
     const login = async () => {
 
+
+
         if (!/\S+@\S+\.\S+/.test(email)) {
             setLogemail(true)
             return
@@ -84,6 +86,7 @@ const Signin = ({ navigation }) => {
         else {
             setLogpass(false)
         }
+
         if (!email || !pass) {
             return false
         }
@@ -113,6 +116,9 @@ const Signin = ({ navigation }) => {
 
     // for register new user
     const otp = async () => {
+        const uppercaseRegex = /[A-Z]/;
+        const lowercaseRegex = /[a-z]/;
+        const specialRegex = /[^A-Za-z0-9]/;
 
         if (!first.trim()) {
             setErrfirst(true)
@@ -141,12 +147,32 @@ const Signin = ({ navigation }) => {
         }
 
         if (pass.length < 6) {
-            setErrpass(true)
+            setErrpass('Password should be at least 6 characters long')
             return
+        }
+
+
+        // Check if password contains at least one uppercase letter
+        if (!uppercaseRegex.test(pass)) {
+            setErrpass('Password should contain at least one uppercase letter');
+            return;
+        }
+
+        // // Check if password contains at least one lowercase letter
+        if (!lowercaseRegex.test(pass)) {
+            setErrpass('Password should contain at least one lowercase letter');
+            return;
+        }
+
+        // // Check if password contains at least one special character
+        if (!specialRegex.test(pass)) {
+            setErrpass('Password should contain at least one special character');
+            return;
         }
         else {
             setErrpass(false)
         }
+
         if (pass !== confirmpass) {
             setErrconfirm(true);
             return
@@ -157,14 +183,6 @@ const Signin = ({ navigation }) => {
         if (!first || !last || !email || !pass || pass !== confirmpass) {
             return false
         }
-
-
-        // if (pass !== confirmpass) {
-        //     setConfirmpass(true)
-        // }
-        // else {
-        //     setErrfirst(false)
-        // }
         if (!toggleCheckBox) {
             Alert.alert('Error', 'accept terms and condition ')
             return;
@@ -398,7 +416,7 @@ const Signin = ({ navigation }) => {
                                     <Eye />
                                 </TouchableOpacity>
                             </View>
-                            {errpass ? <Text style={{ color: "red" }}>Enter Password*</Text> : null}
+                            {errpass ? <Text style={{ color: "red" }}>{errpass}</Text> : null}
                             <View style={styles.pass}>
                                 <TextInput
                                     style={{ fontFamily: 'Mulish-Regular', width: '90%', padding: 10, color: 'black' }}
