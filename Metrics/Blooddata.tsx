@@ -51,6 +51,12 @@ const Blooddata = ({ navigation }: any) => {
 
         }
     }
+    const formatCreatedAt = (createdAt) => {
+        const date = new Date(createdAt);
+        const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+        // Return only the formatted time part
+        return date.toLocaleTimeString('en-US', options);
+    };
 
 
     const Render = ({ item }: any) => (
@@ -66,23 +72,30 @@ const Blooddata = ({ navigation }: any) => {
                             setSelectedHeartRateId(heartData.blood_pressure_id);
                             setModalVisible(true)
                         }}
-                        style={{ width: '95%', marginTop: 10 }}>
-                        {heartData.reading_details.map((detail, i) => (
-                            <View key={i}>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={{ color: 'black', fontFamily: 'Mulish-Regular' }}>{detail.title} :</Text>
-                                    <Text style={{ color: 'black', fontFamily: 'Mulish-Regular' }}> {detail.value}</Text>
+                        style={{ width: '95%', marginTop: 10, flexDirection: 'row', justifyContent: "space-between" }}>
+                        <View>
+                            {heartData.reading_details.map((detail, i) => (
+                                <View key={i} >
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Text style={{ color: 'black', fontFamily: 'Mulish-Regular' }}>{detail.title} :</Text>
+                                        <Text style={{ color: 'black', fontFamily: 'Mulish-Regular' }}> {detail.value}</Text>
+
+                                    </View>
 
                                 </View>
+                            ))}
+                        </View>
+                        <View>
+                            <Text style={{
+                                color: '#4A4A4A', fontSize: 14, fontFamily: 'Mulish-Regular'
+                            }}>{formatCreatedAt(heartData.created_at)}</Text>
+                        </View>
 
-                            </View>
-                        ))}
-                        <View style={{
-                            width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 15
-                        }}></View>
 
                     </TouchableOpacity>
-
+                    <View style={{
+                        width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 15
+                    }}></View>
                 </View>
             ))}
 

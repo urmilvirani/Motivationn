@@ -49,6 +49,13 @@ const Heartdata = ({ navigation }: any) => {
         }
     }
 
+    const formatCreatedAt = (createdAt) => {
+        const date = new Date(createdAt);
+        const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+        // Return only the formatted time part
+        return date.toLocaleTimeString('en-US', options);
+    };
+
     const Render = ({ item }: any) => (
         <View style={{ marginStart: 15, }}>
             <Text style={styles.today}>{item.date}</Text>
@@ -61,9 +68,9 @@ const Heartdata = ({ navigation }: any) => {
                             setSelectedHeartRateId(heartData.heart_rate_id);
                             setModalVisible(true)
                         }}
-                        style={{ flexDirection: 'row', width: '95%', justifyContent: 'space-between', marginTop: 10 }}>
+                        style={{ flexDirection: 'row', width: '95%', justifyContent: 'space-between', marginTop: 10, alignItems: "center" }}>
                         <Text style={{ color: 'black', fontSize: 16, fontFamily: 'Mulish-Regular' }}>{'Pulse rate: '} {heartData.pulse_rate}</Text>
-                        {/* <Text style={{ color: '#4A4A4A', fontSize: 14, fontFamily: 'Mulish-Regular' }}>{heartData.datetime}</Text> */}
+                        <Text style={{ color: '#4A4A4A', fontSize: 14, fontFamily: 'Mulish-Regular' }}>{formatCreatedAt(heartData.datetime)}</Text>
                     </TouchableOpacity>
 
 

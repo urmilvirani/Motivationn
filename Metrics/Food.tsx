@@ -33,6 +33,11 @@ const Food = ({ navigation }: any) => {
     const [selectkg, setSelectkg] = useState('')
     const [selectedHeartRateId, setSelectedHeartRateId] = useState('');
 
+    //validation
+    const [err, setErr] = useState('')
+    const [error, setError] = useState('')
+
+
     useEffect(() => {
 
         food()
@@ -67,8 +72,24 @@ const Food = ({ navigation }: any) => {
 
     const save = async () => {
         try {
+            if (!name) {
+                setErr(true)
+                return
+            }
+            else {
+                setErr(false)
+            }
+            if (!quantity) {
+                setError(true)
+                return
+            }
+            else {
+                setError(false)
+            }
+
             const res = await webservices('food_logging/save', 'POST', data)
             console.log(res.message);
+            setModalVisible(false)
 
         }
         catch (error) {
@@ -126,9 +147,14 @@ const Food = ({ navigation }: any) => {
                                 setSelectedHeartRateId(data.food_log_detail_id)
                                 setDeletemodal(true)
                             }}
-                            key={index} style={{ marginTop: 10 }}>
-                            <Text style={{ color: 'black' }}>{'Food Item :'} {data.food_item}</Text>
-                            <Text style={{ color: 'black' }}>{'Quantity :'} {data.food_item_value} {data.measurement_type_term}</Text>
+                            key={index} style={{ marginTop: 10, width: '100%', }}>
+                            <View style={{ flexDirection: 'row', width: '95%', justifyContent: 'space-between' }}>
+                                <View>
+                                    <Text style={{ color: 'black' }}>{'Food Item :'} {data.food_item}</Text>
+                                    <Text style={{ color: 'black' }}>{'Quantity :'} {data.food_item_value} {data.measurement_type_term}</Text>
+                                </View>
+                                <Text style={{ color: '#4A4A4A', fontSize: 14, fontFamily: 'Mulish-Regular' }}>{formatCreatedAt(data.created_at)}</Text>
+                            </View>
                             <View style={{
                                 width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 10
                             }}></View>
@@ -166,10 +192,17 @@ const Food = ({ navigation }: any) => {
         </View>
     )
 
+    const formatCreatedAt = (createdAt) => {
+        const date = new Date(createdAt);
+        const options = {
+            hour: 'numeric',
+            minute: 'numeric',
 
-
-
-
+            hour12: true // Use 12-hour format
+        };
+        // Convert UTC timestamp to local time and return the formatted time
+        return date.toLocaleTimeString('en-US', options);
+    };
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
             <View style={styles.purple}>
@@ -208,7 +241,6 @@ const Food = ({ navigation }: any) => {
                 isVisible={isModalVisible}
                 style={styles.modal}
 
-
             >
                 <View style={{ flex: 1 }}>
 
@@ -229,11 +261,12 @@ const Food = ({ navigation }: any) => {
                     <View style={{ alignItems: "center", marginTop: 20 }}>
                         <TextInput
                             onChangeText={(text) => setName(text)}
-
+                            value={name}
                             placeholder='Banana'
                             placeholderTextColor={'black'}
                             style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '92%', borderRadius: 10, padding: 10, color: 'black' }}
                         />
+                        {err ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 10, }}>This field is required</Text> : null}
                         <View style={{ flexDirection: 'row' }}>
                             <TextInput
                                 onChangeText={(text) => setQuantity(text)}
@@ -249,6 +282,7 @@ const Food = ({ navigation }: any) => {
                                     : (<Text style={{ color: 'black', fontSize: 18, fontFamily: 'Mulish-Bold' }}>GM</Text>)}
                             </TouchableOpacity>
                         </View>
+                        {error ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 10, }}>This field is required</Text> : null}
 
 
 
@@ -262,10 +296,7 @@ const Food = ({ navigation }: any) => {
                                 <Text style={{ color: '#702B92', fontFamily: 'Mulish-Bold' }}>CANCLE</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                onPress={() => {
-                                    save()
-                                    setModalVisible(false)
-                                }}
+                                onPress={save}
                                 style={{ backgroundColor: '#702B92', width: '45%', padding: 15, borderRadius: 30, marginStart: 10, alignItems: "center" }}>
                                 <Text style={{ color: 'white', fontFamily: 'Mulish-Bold' }}>SAVE</Text>
                             </TouchableOpacity>

@@ -1,6 +1,6 @@
 import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking, ScrollView, TextInput } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Leftarrow } from '../assets/svg'
+import { Leftarrow, Plus } from '../assets/svg'
 import webservices from '../Navigation/webservices'
 import { useFocusEffect } from '@react-navigation/native'
 import Modal from "react-native-modal";
@@ -18,6 +18,7 @@ const Heartrate = ({ navigation }) => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
     const [selectedTime, setSelectedTime] = useState(new Date());
+    const [required, setRequired] = useState('')
 
     const showDatePicker = () => {
         setDatePickerVisibility(true);
@@ -86,6 +87,15 @@ const Heartrate = ({ navigation }) => {
 
     const heart = async () => {
         try {
+            if (!pulse) {
+                setRequired(true)
+                return
+            }
+            else {
+                setRequired(false)
+            }
+
+
 
             const year = selectedDate.getFullYear();
             const month = String(selectedDate.getMonth() + 1).padStart(2, '0'); // Month starts from 0
@@ -114,7 +124,12 @@ const Heartrate = ({ navigation }) => {
 
         }
     }
-
+    const formatCreatedAt = (createdAt) => {
+        const date = new Date(createdAt);
+        const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+        // Return only the formatted time part
+        return date.toLocaleTimeString('en-US', options);
+    };
 
 
 
@@ -125,11 +140,11 @@ const Heartrate = ({ navigation }) => {
             {
                 item.list.map((heartdata, index) => (
                     <View key={index} style={{ marginStart: 15, }}>
-                        <View style={{ flexDirection: "row", width: '95%', justifyContent: 'space-between', marginTop: 10 }}>
+                        <View style={{ flexDirection: "row", width: '95%', justifyContent: 'space-between', marginTop: 10, alignItems: 'center' }}>
                             <Text style={{ color: 'black', fontSize: 16, fontFamily: 'Mulish-Bold' }}>{'Plus rate :'} {heartdata.pulse_rate}  </Text>
-                            {/* <Text style={{
+                            <Text style={{
                                 color: '#4A4A4A', fontSize: 14, fontFamily: 'Mulish-Regular'
-                            }}>{item.time}</Text> */}
+                            }}>{formatCreatedAt(heartdata.datetime)}</Text>
 
                         </View>
                         <View style={{
@@ -228,6 +243,7 @@ const Heartrate = ({ navigation }) => {
                         onConfirm={handleTimeConfirm}
                         onCancel={hideTimePicker}
                     />
+
                     <View style={{ marginStart: 15 }}>
                         <View style={styles.bottom}>
                             <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Date</Text>
@@ -260,28 +276,35 @@ const Heartrate = ({ navigation }) => {
                         </View>
                         <View style={styles.rate}>
                             <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Pulse Rate (bpm)</Text>
-                            <View style={{ height: 54, width: 90, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                            <View style={{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
                                 <TextInput style={{ color: '#4A4A4A', fontFamily: 'Mulish-Bold', fontSize: 18, textAlign: 'center' }}
                                     maxLength={4}
                                     keyboardType='numeric'
                                     onChangeText={(text) => setPulse(text)}
 
+
                                 />
+
                             </View>
+
                         </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 90 }}>
-                            <TouchableOpacity
-                                onPress={() => { setModalVisible(false) }}
-                                style={{ borderWidth: 0.5, borderColor: '#4A4A4A', width: '45%', padding: 15, borderRadius: 30, alignItems: 'center' }}>
-                                <Text style={{ color: '#702B92', fontFamily: 'Mulish-Bold' }}>CANCLE</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={heart}
-                                style={{ backgroundColor: '#702B92', width: '45%', padding: 15, borderRadius: 30, marginStart: 10, alignItems: "center" }}>
-                                <Text style={{ color: 'white', fontFamily: 'Mulish-Bold' }}>SAVE</Text>
-                            </TouchableOpacity>
-                        </View>
+
+                        {required ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
                     </View>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', top: 85 }}>
+                        <TouchableOpacity
+                            onPress={() => { setModalVisible(false) }}
+                            style={{ borderWidth: 0.5, borderColor: '#4A4A4A', width: '45%', padding: 15, borderRadius: 30, alignItems: 'center' }}>
+                            <Text style={{ color: '#702B92', fontFamily: 'Mulish-Bold' }}>CANCLE</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={heart}
+                            style={{ backgroundColor: '#702B92', width: '45%', padding: 15, borderRadius: 30, marginStart: 10, alignItems: "center" }}>
+                            <Text style={{ color: 'white', fontFamily: 'Mulish-Bold' }}>SAVE</Text>
+                        </TouchableOpacity>
+                    </View>
+
                 </View>
             </Modal>
         </SafeAreaView>

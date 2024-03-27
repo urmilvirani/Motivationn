@@ -115,6 +115,7 @@ const Editprofile = ({ navigation }) => {
                 console.log(response.assets[0].uri);
 
                 setProfileImg(response.assets[0].uri);
+                setModalVisible(false)
             }
             else {
                 // Handle cancellation or errors

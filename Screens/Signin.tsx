@@ -1,19 +1,11 @@
 import { Image, SafeAreaView, StyleSheet, Text, View, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react'
 import { Eye } from '../assets/svg'
-import { Facebook } from '../assets/svg'
-import { Google } from '../assets/svg'
-import { Apple } from '../assets/svg'
-import { User } from '../assets/svg'
-import { Tick } from '../assets/svg'
 import webservices from '../Navigation/webservices'
 import Modal from "react-native-modal";
 import CheckBox from '@react-native-community/checkbox';
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import OTPInputView from '@twotalltotems/react-native-otp-input'
-import BottomTab from '../Navigation/BottomTab'
-import Splash from './Splash'
-
+import { Cancel } from '../assets/svg'
 
 
 
@@ -524,14 +516,6 @@ const Signin = ({ navigation }) => {
                         {otperror ? <Text style={{ color: 'red', textAlign: "center", marginTop: 15 }}>Please double-check the OTP and try again</Text> : null}
                     </ScrollView>
 
-
-                    {/* <View style={{ flexDirection: 'row', alignItems: "center", marginTop: 10 }}>
-                        <Text style={{ color: 'black', fontFamily: "Mulish-Regular", marginStart: 100, }}>Didn’t receive code? </Text>
-                        <TouchableOpacity>
-                            <Text style={{ color: 'rgba(112, 43, 146, 1)' }}>Resend</Text>
-                        </TouchableOpacity>
-                    </View> */}
-
                     <View style={{ alignItems: 'center', bottom: 10 }}>
                         <TouchableOpacity
                             onPress={verify}
@@ -539,8 +523,13 @@ const Signin = ({ navigation }) => {
                             <Text style={{ color: 'white', fontFamily: 'Mulish-Bold', }}>VERIFY</Text>
                         </TouchableOpacity>
                     </View>
-
+                    <TouchableOpacity
+                        onPress={() => setModalVisible(false)}
+                        style={{ position: 'absolute', width: '98%', alignItems: 'flex-end', bottom: 300 }}>
+                        <Cancel />
+                    </TouchableOpacity>
                 </View>
+
 
             </Modal>
         </SafeAreaView >

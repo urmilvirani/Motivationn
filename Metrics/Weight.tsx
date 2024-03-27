@@ -18,6 +18,8 @@ const Weight = ({ navigation }) => {
     const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
     const [selectedTime, setSelectedTime] = useState(new Date());
     const [loading, setLoading] = useState('')
+    const [required, setRequired] = useState('')
+
 
 
     const showDatePicker = () => {
@@ -82,7 +84,13 @@ const Weight = ({ navigation }) => {
 
     const setWeight = async () => {
         try {
-
+            if (!weigh) {
+                setRequired(true)
+                return
+            }
+            else {
+                setRequired(false)
+            }
             const year = selectedDate.getFullYear();
             const month = String(selectedDate.getMonth() + 1).padStart(2, '0'); // Month starts from 0
             const day = String(selectedDate.getDate()).padStart(2, '0');
@@ -111,7 +119,12 @@ const Weight = ({ navigation }) => {
         }
     }
 
-
+    const formatCreatedAt = (createdAt) => {
+        const date = new Date(createdAt);
+        const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+        // Return only the formatted time part
+        return date.toLocaleTimeString('en-US', options);
+    };
 
     const Render = ({ item }: any) => (
 
@@ -122,9 +135,9 @@ const Weight = ({ navigation }) => {
                     <View key={index} style={{ marginStart: 15, }}>
                         <View style={{ flexDirection: "row", width: '95%', justifyContent: 'space-between', marginTop: 10 }}>
                             <Text style={{ color: 'black', fontSize: 16, fontFamily: 'Mulish-Bold' }}>{'Weight :'} {heartdata.weight}{'kg'}  </Text>
-                            {/* <Text style={{
+                            <Text style={{
                                 color: '#4A4A4A', fontSize: 14, fontFamily: 'Mulish-Regular'
-                            }}>{item.time}</Text> */}
+                            }}>{formatCreatedAt(heartdata.datetime)}</Text>
 
                         </View>
                         <View style={{
@@ -245,7 +258,7 @@ const Weight = ({ navigation }) => {
                         </View>
                         <View style={styles.rate}>
                             <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Weight (kg)</Text>
-                            <View style={{ height: 54, width: 90, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                            <View style={{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
                                 <TextInput
                                     keyboardType='numeric'
                                     maxLength={4}
@@ -254,19 +267,21 @@ const Weight = ({ navigation }) => {
                                 />
                             </View>
                         </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 90 }}>
-                            <TouchableOpacity
-                                onPress={() => { setModalVisible(false) }}
-                                style={{ borderWidth: 0.5, borderColor: '#4A4A4A', width: '45%', padding: 15, borderRadius: 30, alignItems: 'center' }}>
-                                <Text style={{ color: '#702B92', fontFamily: 'Mulish-Bold' }}>CANCLE</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={setWeight}
-                                style={{ backgroundColor: '#702B92', width: '45%', padding: 15, borderRadius: 30, marginStart: 10, alignItems: "center" }}>
-                                <Text style={{ color: 'white', fontFamily: 'Mulish-Bold' }}>SAVE</Text>
-                            </TouchableOpacity>
-                        </View>
+                        {required ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
                     </View>
+                    <View style={{ flexDirection: 'row', marginTop: 90, justifyContent: 'center' }}>
+                        <TouchableOpacity
+                            onPress={() => { setModalVisible(false) }}
+                            style={{ borderWidth: 0.5, borderColor: '#4A4A4A', width: '45%', padding: 15, borderRadius: 30, alignItems: 'center' }}>
+                            <Text style={{ color: '#702B92', fontFamily: 'Mulish-Bold' }}>CANCLE</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={setWeight}
+                            style={{ backgroundColor: '#702B92', width: '45%', padding: 15, borderRadius: 30, marginStart: 10, alignItems: "center" }}>
+                            <Text style={{ color: 'white', fontFamily: 'Mulish-Bold' }}>SAVE</Text>
+                        </TouchableOpacity>
+                    </View>
+
                 </View>
             </Modal>
         </SafeAreaView>

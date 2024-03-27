@@ -48,7 +48,12 @@ const Heartdata = ({ navigation }: any) => {
 
         }
     }
-
+    const formatCreatedAt = (createdAt) => {
+        const date = new Date(createdAt);
+        const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+        // Return only the formatted time part
+        return date.toLocaleTimeString('en-US', options);
+    };
 
 
     const Render = ({ item }: any) => (
@@ -65,7 +70,7 @@ const Heartdata = ({ navigation }: any) => {
                         }}
                         style={{ flexDirection: 'row', width: '95%', justifyContent: 'space-between', marginTop: 10 }}>
                         <Text style={{ color: 'black', fontSize: 16, fontFamily: 'Mulish-Regular' }}>{'Weight: '} {weightData.weight} {'kg'}</Text>
-                        {/* <Text style={{ color: '#4A4A4A', fontSize: 14, fontFamily: 'Mulish-Regular' }}>{heartData.datetime}</Text> */}
+                        <Text style={{ color: '#4A4A4A', fontSize: 14, fontFamily: 'Mulish-Regular' }}>{formatCreatedAt(weightData.datetime)}</Text>
                     </TouchableOpacity><View style={{
                         width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 10
                     }}></View>

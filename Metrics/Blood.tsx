@@ -16,6 +16,9 @@ const Blood = ({ navigation }: any) => {
     const [pulse, setPulse] = useState('')
     const [isModalVisible, setModalVisible] = useState(false);
     const [loading, setLoading] = useState('')
+    const [syserr, setSyserr] = useState('')
+    const [diaerr, setDiaerr] = useState('')
+    const [pulseerr, setPluseerr] = useState('')
 
     useEffect(() => {
         blood()
@@ -62,6 +65,28 @@ const Blood = ({ navigation }: any) => {
                 ]
             };
 
+            if (!systolic) {
+                setSyserr(true)
+                return
+            }
+            else {
+                setSyserr(false)
+            }
+            if (!diastolic) {
+                setDiaerr(true)
+                return
+            }
+            else {
+                setDiaerr(false)
+            }
+            if (!pulse) {
+                setPluseerr(true)
+                return
+            }
+            else {
+                setPluseerr(false)
+            }
+
             const res = await webservices('blood_pressure/save', 'POST', data)
             console.log(res);
             setModalVisible(false)
@@ -71,7 +96,12 @@ const Blood = ({ navigation }: any) => {
 
         }
     }
-
+    const formatCreatedAt = (createdAt) => {
+        const date = new Date(createdAt);
+        const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+        // Return only the formatted time part
+        return date.toLocaleTimeString('en-US', options);
+    };
 
     const Render = ({ item }) => (
 
@@ -79,29 +109,38 @@ const Blood = ({ navigation }: any) => {
 
             {item.list.map((heartData: any, index: number) => (
                 <View key={index}>
-                    <View style={{ width: '95%', marginTop: 10 }}>
-                        {heartData.reading_details.map((detail: any, i: number) => (
-                            <View key={i}>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Text style={{ color: 'black', fontFamily: 'Mulish-Regular' }}>{detail.title} :</Text>
-                                    <Text style={{ color: 'black', fontFamily: 'Mulish-Regular' }}> {detail.value}</Text>
+                    <View style={{ width: '95%', marginTop: 10, flexDirection: 'row', justifyContent: "space-between" }}>
+                        <View>
+                            {heartData.reading_details.map((detail: any, i: number) => (
+                                <View key={i} >
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Text style={{ color: 'black', fontFamily: 'Mulish-Regular' }}>{detail.title} :</Text>
+                                        <Text style={{ color: 'black', fontFamily: 'Mulish-Regular' }}> {detail.value}</Text>
+
+                                    </View>
 
                                 </View>
+                            ))}
+                        </View>
+                        <View>
+                            <Text style={{
+                                color: '#4A4A4A', fontSize: 14, fontFamily: 'Mulish-Regular'
+                            }}>{formatCreatedAt(heartData.created_at)}</Text>
+                        </View>
 
-                            </View>
-                        ))}
-                        <View style={{
-                            width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 15
-                        }}></View>
+
 
                     </View>
-
+                    <View style={{
+                        width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 15
+                    }}></View>
                 </View>
             ))}
 
 
         </View>
     )
+
 
     return (
 
@@ -181,7 +220,7 @@ const Blood = ({ navigation }: any) => {
                     <View style={{ marginStart: 15 }}>
                         <View style={styles.rate}>
                             <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Systolic (mmHg)</Text>
-                            <View style={{ height: 54, width: 90, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                            <View style={{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
                                 <TextInput
                                     keyboardType='numeric'
                                     maxLength={4}
@@ -189,6 +228,7 @@ const Blood = ({ navigation }: any) => {
                                     onChangeText={(text) => setSystolic(text)} />
                             </View>
                         </View>
+                        {syserr ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
                         <View style={{
                             width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 15
                         }}>
@@ -196,7 +236,7 @@ const Blood = ({ navigation }: any) => {
                         </View>
                         <View style={styles.rate}>
                             <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Diastolic (mmHg)</Text>
-                            <View style={{ height: 54, width: 90, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                            <View style={{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
                                 <TextInput
                                     keyboardType='numeric'
                                     maxLength={4}
@@ -205,6 +245,7 @@ const Blood = ({ navigation }: any) => {
                                 />
                             </View>
                         </View>
+                        {diaerr ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
                         <View style={{
                             width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 15
                         }}>
@@ -212,7 +253,7 @@ const Blood = ({ navigation }: any) => {
                         </View>
                         <View style={styles.rate}>
                             <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Pulse Rate (mmHg)</Text>
-                            <View style={{ height: 54, width: 90, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                            <View style={{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
                                 <TextInput
                                     keyboardType='numeric'
                                     maxLength={4}
@@ -221,18 +262,20 @@ const Blood = ({ navigation }: any) => {
                                 />
                             </View>
                         </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 40 }}>
-                            <TouchableOpacity
-                                onPress={() => { setModalVisible(false) }}
-                                style={{ borderWidth: 0.5, borderColor: '#4A4A4A', width: '45%', padding: 15, borderRadius: 30, alignItems: 'center' }}>
-                                <Text style={{ color: '#702B92', fontFamily: 'Mulish-Bold' }}>CANCLE</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={save}
-                                style={{ backgroundColor: '#702B92', width: '45%', padding: 15, borderRadius: 30, marginStart: 10, alignItems: "center" }}>
-                                <Text style={{ color: 'white', fontFamily: 'Mulish-Bold' }}>SAVE</Text>
-                            </TouchableOpacity>
-                        </View>
+                        {pulseerr ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
+                    </View>
+                    <View style={{ flexDirection: 'row', marginTop: 40, justifyContent: "center" }}>
+                        <TouchableOpacity
+                            onPress={() => { setModalVisible(false) }}
+                            style={{ borderWidth: 0.5, borderColor: '#4A4A4A', width: '45%', padding: 15, borderRadius: 30, alignItems: 'center' }}>
+                            <Text style={{ color: '#702B92', fontFamily: 'Mulish-Bold' }}>CANCLE</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={save}
+                            style={{ backgroundColor: '#702B92', width: '45%', padding: 15, borderRadius: 30, marginStart: 10, alignItems: "center" }}>
+                            <Text style={{ color: 'white', fontFamily: 'Mulish-Bold' }}>SAVE</Text>
+                        </TouchableOpacity>
+
                     </View>
                 </View>
             </Modal>
