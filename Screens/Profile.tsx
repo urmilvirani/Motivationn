@@ -2,8 +2,7 @@ import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, FlatList, Image
 import React, { useEffect, useState, } from 'react'
 import { Leftarrow } from '../assets/svg'
 import { Edit } from '../assets/svg'
-import Pdf from 'react-native-pdf';
-import WebView from 'react-native-webview';
+import Modal from "react-native-modal";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import webservices from '../Navigation/webservices';
 import { useFocusEffect } from '@react-navigation/native';
@@ -12,9 +11,8 @@ import Ploder from '../component/Ploder';
 const Profile = ({ navigation }) => {
 
     const [user, setUser] = useState('')
-    const [avatarSource, setAvatarSource] = useState('')
     const [loading, setLoading] = useState(true);
-
+    const [isModalVisible, setModalVisible] = useState(false);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -24,8 +22,6 @@ const Profile = ({ navigation }) => {
             };
         }, [])
     );
-
-
 
     const profile = async () => {
         try {
@@ -61,7 +57,6 @@ const Profile = ({ navigation }) => {
 
         }
     };
-
 
     return (
         <SafeAreaView style={{ height: '100%', backgroundColor: 'white', }}>
@@ -110,7 +105,8 @@ const Profile = ({ navigation }) => {
 
 
                 <TouchableOpacity
-                    onPress={logout}
+                    // onPress={logout}
+                    onPress={() => setModalVisible(true)}
                     style={styles.logout}>
                     <Image source={require('../assets/image/logout.png')} style={{ height: 24, width: 24 }} />
                     <Text style={{
@@ -118,6 +114,33 @@ const Profile = ({ navigation }) => {
                     }}>Logout</Text>
                 </TouchableOpacity>
             </View>
+            <Modal
+                isVisible={isModalVisible}
+                style={styles.modal}
+            >
+                <View style={{ flex: 1 }}>
+                    <Text style={{ color: 'black', fontFamily: 'Mulish-Bold', fontSize: 16, textAlign: 'center', marginTop: 15 }}>
+                        Logout
+                    </Text>
+                    <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, textAlign: 'center', marginTop: 15 }}>
+                        Are you sure you want to Logout?
+                    </Text>
+                    <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: "center" }}>
+                        <TouchableOpacity
+                            onPress={() => setModalVisible(false)}
+                            style={{ width: '40%', borderWidth: 1, padding: 8, backgroundColor: 'white', borderRadius: 10 }}>
+                            <Text style={{ color: 'black', textAlign: "center", fontFamily: 'Mulish-ExtraBold' }}> Cancle</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+
+                            onPress={logout}
+                            style={{ width: '40%', borderWidth: 1, padding: 8, backgroundColor: 'black', marginStart: 20, borderRadius: 10 }}>
+                            <Text style={{ color: 'white', textAlign: 'center', fontFamily: 'Mulish-ExtraBold' }}> Yes</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                </View>
+            </Modal>
 
         </SafeAreaView >
     )
@@ -157,5 +180,16 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         borderRadius: 15
+    },
+    modal: {
+        position: 'absolute',
+        backgroundColor: '#FBF4FF',
+        height: '18%',
+        width: '100%',
+        marginStart: 0,
+        bottom: 0,
+        marginBottom: 0,
+        borderTopLeftRadius: 25,
+        borderTopRightRadius: 25
     }
 })

@@ -4,6 +4,7 @@ import { Leftarrow } from '../assets/svg'
 import Modal from "react-native-modal";
 import webservices from '../Navigation/webservices';
 import Metricloader from '../component/Metricloader';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const Blood = ({ navigation }: any) => {
@@ -20,10 +21,20 @@ const Blood = ({ navigation }: any) => {
     const [diaerr, setDiaerr] = useState('')
     const [pulseerr, setPluseerr] = useState('')
 
-    useEffect(() => {
-        blood()
+    // useEffect(() => {
+    //     blood()
 
-    }, [])
+    // }, [])
+
+    useFocusEffect(
+        React.useCallback(() => {
+            blood()
+            return () => {
+                // Cleanup function (if needed)
+            };
+        }, [])
+    );
+
     const blood = async () => {
         try {
             setLoading(true)
@@ -69,26 +80,20 @@ const Blood = ({ navigation }: any) => {
                 setSyserr(true)
                 return
             }
-            else {
-                setSyserr(false)
-            }
+
             if (!diastolic) {
                 setDiaerr(true)
                 return
             }
-            else {
-                setDiaerr(false)
-            }
+
             if (!pulse) {
                 setPluseerr(true)
                 return
             }
-            else {
-                setPluseerr(false)
-            }
 
             const res = await webservices('blood_pressure/save', 'POST', data)
             console.log(res);
+            blood()
             setModalVisible(false)
 
         }
@@ -140,7 +145,14 @@ const Blood = ({ navigation }: any) => {
 
         </View>
     )
-
+    const resetModalState = () => {
+        setSystolic('');
+        setDiastolic('');
+        setPulse('');
+        setSyserr('');
+        setDiaerr('');
+        setPluseerr('');
+    };
 
     return (
 
@@ -212,6 +224,8 @@ const Blood = ({ navigation }: any) => {
             <Modal
                 isVisible={isModalVisible}
                 style={styles.model}
+                onModalShow={resetModalState} // Call resetModalState when the modal is shown
+                onModalHide={resetModalState}
             >
                 <View style={{ flex: 1 }}>
                     <View style={{ alignItems: 'center', marginTop: 25 }}>
@@ -220,15 +234,18 @@ const Blood = ({ navigation }: any) => {
                     <View style={{ marginStart: 15 }}>
                         <View style={styles.rate}>
                             <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Systolic (mmHg)</Text>
-                            <View style={{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                            <View style={[{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.5, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }, { borderColor: syserr ? '#cc0000' : '#4A4A4A' }]}>
                                 <TextInput
                                     keyboardType='numeric'
                                     maxLength={4}
                                     style={{ color: '#4A4A4A', fontFamily: 'Mulish-Bold', fontSize: 18, textAlign: 'center' }}
-                                    onChangeText={(text) => setSystolic(text)} />
+                                    onChangeText={(text) => {
+                                        setSyserr(false)
+                                        setSystolic(text)
+                                    }} />
                             </View>
                         </View>
-                        {syserr ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
+                        {syserr ? <Text style={{ color: "#cc0000", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
                         <View style={{
                             width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 15
                         }}>
@@ -236,16 +253,19 @@ const Blood = ({ navigation }: any) => {
                         </View>
                         <View style={styles.rate}>
                             <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Diastolic (mmHg)</Text>
-                            <View style={{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                            <View style={[{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.5, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }, , { borderColor: diaerr ? '#cc0000' : '#4A4A4A' }]}>
                                 <TextInput
                                     keyboardType='numeric'
                                     maxLength={4}
                                     style={{ color: '#4A4A4A', fontFamily: 'Mulish-Bold', fontSize: 18, textAlign: 'center' }}
-                                    onChangeText={(text) => setDiastolic(text)}
+                                    onChangeText={(text) => {
+                                        setDiaerr(false)
+                                        setDiastolic(text)
+                                    }}
                                 />
                             </View>
                         </View>
-                        {diaerr ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
+                        {diaerr ? <Text style={{ color: "#cc0000", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
                         <View style={{
                             width: '95%', height: 1, backgroundColor: '#EAEAEA', marginTop: 15
                         }}>
@@ -253,16 +273,20 @@ const Blood = ({ navigation }: any) => {
                         </View>
                         <View style={styles.rate}>
                             <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Pulse Rate (mmHg)</Text>
-                            <View style={{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                            <View style={[{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.5, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }, , { borderColor: pulseerr ? '#cc0000' : '#4A4A4A' }]}>
                                 <TextInput
                                     keyboardType='numeric'
                                     maxLength={4}
                                     style={{ color: '#4A4A4A', fontFamily: 'Mulish-Bold', fontSize: 18, textAlign: 'center' }}
-                                    onChangeText={(text) => setPulse(text)}
+                                    onChangeText={(text) => {
+
+                                        setPluseerr(false)
+                                        setPulse(text)
+                                    }}
                                 />
                             </View>
                         </View>
-                        {pulseerr ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
+                        {pulseerr ? <Text style={{ color: "#cc0000", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
                     </View>
                     <View style={{ flexDirection: 'row', marginTop: 40, justifyContent: "center" }}>
                         <TouchableOpacity

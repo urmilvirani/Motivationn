@@ -41,6 +41,7 @@ const Heartdata = ({ navigation }: any) => {
             data.append('heart_rate_id', selectedHeartRateId)
             const dele = await webservices('heart_rate/delete', 'POST', data)
             console.log('hello', dele);
+            heart()
 
         }
         catch (error) {

@@ -41,7 +41,7 @@ const Heartdata = ({ navigation }: any) => {
             data.append('weight_measurement_id', selectedHeartRateId)
             const dele = await webservices('weight_measurement/delete', 'POST', data)
             console.log('hello', dele);
-
+            weight()
         }
         catch (error) {
             console.log(error);

@@ -6,8 +6,9 @@ import { Calander } from '../assets/svg'
 import Modal from "react-native-modal";
 import webservices from '../Navigation/webservices'
 import Metricloader from '../component/Metricloader'
+import { useFocusEffect } from '@react-navigation/native'
 
-const Food = ({ navigation }: any) => {
+const Food = ({ navigation }) => {
 
     const [loading, setLoading] = useState('')
 
@@ -41,7 +42,6 @@ const Food = ({ navigation }: any) => {
     useEffect(() => {
 
         food()
-
     }, [])
 
 
@@ -76,19 +76,16 @@ const Food = ({ navigation }: any) => {
                 setErr(true)
                 return
             }
-            else {
-                setErr(false)
-            }
+
             if (!quantity) {
                 setError(true)
                 return
             }
-            else {
-                setError(false)
-            }
+
 
             const res = await webservices('food_logging/save', 'POST', data)
             console.log(res.message);
+            food()
             setModalVisible(false)
 
         }
@@ -203,6 +200,15 @@ const Food = ({ navigation }: any) => {
         // Convert UTC timestamp to local time and return the formatted time
         return date.toLocaleTimeString('en-US', options);
     };
+
+    const resetModal = () => {
+        setName('');
+        setQuantity('');
+        setSelectkg('');
+        setErr('');
+        setError('');
+    }
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
             <View style={styles.purple}>
@@ -240,6 +246,9 @@ const Food = ({ navigation }: any) => {
             <Modal
                 isVisible={isModalVisible}
                 style={styles.modal}
+                onModalShow={resetModal}
+                onModalHide={resetModal}
+
 
             >
                 <View style={{ flex: 1 }}>
@@ -260,20 +269,26 @@ const Food = ({ navigation }: any) => {
 
                     <View style={{ alignItems: "center", marginTop: 20 }}>
                         <TextInput
-                            onChangeText={(text) => setName(text)}
+                            onChangeText={(text) => {
+                                setErr(false)
+                                setName(text)
+                            }}
                             value={name}
                             placeholder='Banana'
                             placeholderTextColor={'black'}
-                            style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '92%', borderRadius: 10, padding: 10, color: 'black' }}
+                            style={[{ borderWidth: 0.5, borderColor: 'lightgray', width: '92%', borderRadius: 10, padding: 10, color: 'black' }, { borderColor: err ? '#cc0000' : 'lightgray' }]}
                         />
-                        {err ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 10, }}>This field is required</Text> : null}
+                        {err ? <Text style={{ color: "#cc0000", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 10, }}>This field is required</Text> : null}
                         <View style={{ flexDirection: 'row' }}>
                             <TextInput
-                                onChangeText={(text) => setQuantity(text)}
+                                onChangeText={(text) => {
+                                    setError(false)
+                                    setQuantity(text)
+                                }}
                                 keyboardType='numeric'
                                 placeholder='250 gm'
                                 placeholderTextColor={'black'}
-                                style={{ borderWidth: 0.5, borderColor: 'lightgray', width: '70%', borderRadius: 10, marginTop: 10, padding: 10, color: 'black' }}
+                                style={[{ borderWidth: 0.5, borderColor: 'lightgray', width: '70%', borderRadius: 10, marginTop: 10, padding: 10, color: 'black' }, { borderColor: error ? '#cc0000' : 'lightgray' }]}
                             />
                             <TouchableOpacity
                                 onPress={() => setGm(true)}
@@ -282,7 +297,7 @@ const Food = ({ navigation }: any) => {
                                     : (<Text style={{ color: 'black', fontSize: 18, fontFamily: 'Mulish-Bold' }}>GM</Text>)}
                             </TouchableOpacity>
                         </View>
-                        {error ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 10, }}>This field is required</Text> : null}
+                        {error ? <Text style={{ color: "#cc0000", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 10, }}>This field is required</Text> : null}
 
 
 
@@ -507,6 +522,4 @@ const weight = [
 
                 </View>
             </Modal> */}
-const [lastFiveDates, setLastFiveDates] = useState([]);
-const [datevisible, setDatevisible] = useState('')
-const [datee, setDatee] = useState('')
+//  in this modal first time if i send data that time it work properly but when i open that model again that time that directly get data 

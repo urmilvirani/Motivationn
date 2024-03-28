@@ -14,7 +14,7 @@ const Signin = ({ navigation }) => {
     //conditions
     const [touch, SetTouch] = useState(1)
     const [toggleCheckBox, setToggleCheckBox] = useState(false)
-    const [isTextVisible, setIsTextVisible] = useState(true);
+
     const [isModalVisible, setModalVisible] = useState(false);
 
     //text inputs
@@ -58,12 +58,18 @@ const Signin = ({ navigation }) => {
     data.append('username', email)
     data.append('authentication_type', 'email')
 
-    // hide and show password
+
+    const [secureTextEntry, setSecureTextEntry] = useState(true);
+    // hide and show password for register
     const toggleTextVisibility = () => {
-        setIsTextVisible(prevState => !prevState);
+        setSecureTextEntry(!secureTextEntry);
     };
 
-
+    //hide and show pass for login
+    const [isTextVisible, setIsTextVisible] = useState(true);
+    const loginpass = () => {
+        setIsTextVisible(!isTextVisible);
+    };
 
     const [user, setUser] = useState('')
 
@@ -75,22 +81,15 @@ const Signin = ({ navigation }) => {
             setLogemail(true)
             return
         }
-        else {
-            setLogemail(false)
-        }
 
         if (pass.length < 6) {
             setLogpass(true)
             return
         }
-        else {
-            setLogpass(false)
-        }
 
         if (!email || !pass) {
             return false
         }
-
 
         try {
             const response = await webservices('user_login', 'POST', data)
@@ -124,26 +123,15 @@ const Signin = ({ navigation }) => {
             setErrfirst(true)
             return
         }
-        else {
-            setErrfirst(false)
-        }
+
         if (!last.trim()) {
             setErrlast(true)
             return
         }
-        else {
-            setErrlast(false)
-
-        }
-
         if (!/\S+@\S+\.\S+/.test(email)) {
 
             setErremail(true)
             return
-        }
-
-        else {
-            setErremail(false)
         }
 
         if (pass.length < 6) {
@@ -169,16 +157,11 @@ const Signin = ({ navigation }) => {
             setErrpass('Password should contain at least one special character');
             return;
         }
-        else {
-            setErrpass(false)
-        }
 
         if (pass !== confirmpass) {
             setErrconfirm(true);
             return
 
-        } else {
-            setErrconfirm(false);
         }
         if (!first || !last || !email || !pass || pass !== confirmpass) {
             return false
@@ -220,10 +203,6 @@ const Signin = ({ navigation }) => {
 
 
     }
-
-
-
-
 
     const verify = async () => {
         try {
@@ -312,30 +291,36 @@ const Signin = ({ navigation }) => {
                 </View>
 
                 {touch == 1 && <View style={{ marginStart: 15 }}>
-                    <View style={{ borderWidth: 1, borderColor: 'lightgray', width: '95%', borderRadius: 10, marginTop: 25, }}>
+                    <View style={[{ borderWidth: 0.5, borderColor: 'lightgray', width: '95%', borderRadius: 10, marginTop: 25, }, { borderColor: logemail ? '#cc0000' : 'gray' }]}>
                         <TextInput
                             style={{ fontFamily: 'Mulish-Regular', color: 'black', padding: 10 }}
                             placeholder='Enter your Email Address'
                             placeholderTextColor={'black'}
-                            onChangeText={(text) => setEmail(text)}
+                            onChangeText={(text) => {
+                                setLogemail(false)
+                                setEmail(text)
+                            }}
                         />
                     </View>
-                    {logemail ? <Text style={{ color: "red" }}>Enter your valid Email*</Text> : null}
+                    {logemail ? <Text style={{ color: "#cc0000" }}>Enter your valid Email*</Text> : null}
 
-                    <View style={{ borderWidth: 1, borderColor: 'lightgray', width: '95%', borderRadius: 10, marginTop: 15, flexDirection: 'row', alignItems: "center" }}>
+                    <View style={[{ borderWidth: 0.5, borderColor: 'lightgray', width: '95%', borderRadius: 10, marginTop: 15, flexDirection: 'row', alignItems: "center" }, { borderColor: logpass ? '#cc0000' : 'gray' }]}>
                         <TextInput
                             style={{ fontFamily: 'Mulish-Regular', width: '90%', padding: 10, color: 'black' }}
                             placeholder='Enter Password'
                             placeholderTextColor={'black'}
-                            onChangeText={(text) => setPass(text)}
+                            onChangeText={(text) => {
+                                setLogpass(false)
+                                setPass(text)
+                            }}
 
-                            secureTextEntry={!isTextVisible}
+                            secureTextEntry={isTextVisible}
                         />
-                        <TouchableOpacity onPress={toggleTextVisibility}>
-                            <Eye name={isTextVisible ? 'off' : 'on'} />
+                        <TouchableOpacity onPress={loginpass}>
+                            <Eye />
                         </TouchableOpacity>
                     </View>
-                    {logpass ? <Text style={{ color: "red" }}>Password must be at least 6 characters long*</Text> : null}
+                    {logpass ? <Text style={{ color: '#cc0000' }}>Password must be at least 6 characters long*</Text> : null}
 
 
 
@@ -383,59 +368,75 @@ const Signin = ({ navigation }) => {
 
                         <View style={{ marginStart: 15 }}>
                             <TextInput
-                                style={{ fontFamily: 'Mulish-Regular', borderWidth: 0.5, borderColor: 'gray', borderRadius: 10, marginTop: 20, padding: 10, color: 'black', width: '95%' }}
+                                style={[styles.firstname, { borderColor: errfirst ? '#cc0000' : 'gray' }]}
                                 placeholder='Enter First Name'
                                 placeholderTextColor={'black'}
-                                onChangeText={(text) => setFirst(text)}
+                                onChangeText={(text) => {
+                                    setErrfirst(false)
+                                    setFirst(text)
+                                }}
 
                             />
-                            {errfirst ? <Text style={{ color: "red" }}>Enter your first name*</Text> : null}
+                            {errfirst ? <Text style={{ color: "#cc0000" }}> Please Enter first name.</Text> : null}
                             <TextInput
-                                style={{ fontFamily: 'Mulish-Regular', borderWidth: 0.5, borderColor: 'gray', borderRadius: 10, marginTop: 10, padding: 10, color: 'black', width: '95%' }}
+                                style={[styles.lastnameemail, { borderColor: errlast ? '#cc0000' : 'gray' }]}
                                 placeholder='Enter Last Name'
                                 placeholderTextColor={'black'}
-                                onChangeText={(text) => setLast(text)}
+                                onChangeText={(text) => {
+                                    setErrlast(false)
+                                    setLast(text)
+                                }}
                             />
-                            {errlast ? <Text style={{ color: "red" }}>Enter your last name*</Text> : null}
+                            {errlast ? <Text style={{ color: "#cc0000", fontFamily: 'MUlish-Regular' }}> Please Enter last name.</Text> : null}
                             <TextInput
-                                style={{ fontFamily: 'Mulish-Regular', borderWidth: 0.5, borderColor: 'gray', borderRadius: 10, marginTop: 10, padding: 10, color: 'black', width: '95%' }}
+                                style={[styles.lastnameemail, { borderColor: erremail ? '#cc0000' : 'gray' }]}
                                 placeholder='Enter Email '
                                 placeholderTextColor={'black'}
-                                onChangeText={(text) => setEmail(text)}
+                                onChangeText={(text) => {
+                                    setErremail(false)
+                                    setEmail(text)
+                                }}
                             />
-                            {erremail ? <Text style={{ color: "red" }}>Enter your valid Email*</Text> : null}
-                            <View style={styles.pass}>
+                            {erremail ? <Text style={{ color: "#cc0000" }}> Please Enter Email Address.</Text> : null}
+                            <View style={[styles.pass, { borderColor: errpass ? 'red' : 'gray' }]}>
                                 <TextInput
                                     style={{ fontFamily: 'Mulish-Regular', width: '90%', padding: 10, color: 'black' }}
                                     placeholder='Enter Password '
                                     placeholderTextColor={'black'}
-                                    onChangeText={(text) => setPass(text)}
-                                    secureTextEntry={!isTextVisible}
+                                    onChangeText={(text) => {
+                                        setErrpass(false)
+                                        setPass(text)
+                                    }}
+                                    secureTextEntry={secureTextEntry}
                                 />
                                 <TouchableOpacity onPress={toggleTextVisibility}>
                                     <Eye />
                                 </TouchableOpacity>
                             </View>
-                            {errpass ? <Text style={{ color: "red" }}>{errpass}</Text> : null}
-                            <View style={styles.pass}>
+                            {errpass ? <Text style={{ color: "#cc0000" }}>{errpass}</Text> : null}
+                            <View style={[styles.pass, { borderColor: errconfirm ? '#cc0000' : 'gray' }]}>
                                 <TextInput
                                     style={{ fontFamily: 'Mulish-Regular', width: '90%', padding: 10, color: 'black' }}
                                     placeholder='Confirm Password '
                                     placeholderTextColor={'black'}
-                                    onChangeText={(text) => setConfirmpass(text)}
-                                    secureTextEntry={!isTextVisible}
+                                    onChangeText={(text) => {
+                                        setErrconfirm(false)
+                                        setConfirmpass(text)
+                                    }}
+                                    secureTextEntry={secureTextEntry}
                                 />
                                 <TouchableOpacity onPress={toggleTextVisibility}>
                                     <Eye />
                                 </TouchableOpacity>
                             </View>
-                            {errconfirm ? <Text style={{ color: "red" }}>Enter confirm password*</Text> : null}
+                            {errconfirm ? <Text style={{ color: "#cc0000" }}>Enter confirm password.</Text> : null}
                         </View>
-                        <View style={{ flexDirection: 'row', marginTop: 15, width: 240, justifyContent: 'space-between', alignItems: 'center', marginStart: 15 }}>
+                        <View style={{ flexDirection: 'row', marginTop: 15, width: 240, justifyContent: 'space-between', alignItems: 'center', marginStart: 15, }}>
 
                             <CheckBox
-                                style={{ borderWidth: 1, borderColor: 'black' }}
+                                style={{ borderColor: 'black', }}
                                 disabled={false}
+                                tintColors={{ true: 'green' }}
                                 value={toggleCheckBox}
                                 onValueChange={(newValue) => setToggleCheckBox(newValue)}
                                 tintColor='black'
@@ -636,5 +637,25 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
 
+    },
+    firstname: {
+        fontFamily: 'Mulish-Regular',
+        borderWidth: 0.5,
+        borderColor: 'gray',
+        borderRadius: 10,
+        marginTop: 20,
+        padding: 10,
+        color: 'black',
+        width: '95%'
+    },
+    lastnameemail: {
+        fontFamily: 'Mulish-Regular',
+        borderWidth: 0.5,
+        borderColor: 'gray',
+        borderRadius: 10,
+        marginTop: 10,
+        padding: 10,
+        color: 'black',
+        width: '95%'
     }
 })

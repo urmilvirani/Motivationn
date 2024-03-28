@@ -44,6 +44,7 @@ const Blooddata = ({ navigation }: any) => {
             data.append('blood_pressure_id', selectedHeartRateId)
             const dele = await webservices('blood_pressure/delete', 'POST', data)
             console.log('hello', dele);
+            Data()
 
         }
         catch (error) {

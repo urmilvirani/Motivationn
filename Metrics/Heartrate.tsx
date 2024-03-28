@@ -50,11 +50,14 @@ const Heartrate = ({ navigation }) => {
     useFocusEffect(
         React.useCallback(() => {
             heartapi()
+
             return () => {
                 // Cleanup function (if needed)
             };
         }, [])
     );
+
+
 
 
     const heartapi = async () => {
@@ -91,9 +94,7 @@ const Heartrate = ({ navigation }) => {
                 setRequired(true)
                 return
             }
-            else {
-                setRequired(false)
-            }
+
 
 
 
@@ -116,6 +117,7 @@ const Heartrate = ({ navigation }) => {
             const save = await webservices('heart_rate/save', "POST", data)
             console.log('saved', save.message);
             // setPulse(save)
+            heartapi()
             setModalVisible(false)
 
         }
@@ -155,6 +157,13 @@ const Heartrate = ({ navigation }) => {
         </View>
     )
     const [isModalVisible, setModalVisible] = useState(false);
+
+    const resetModalState = () => {
+        setPulse('');
+        setSelectedDate(new Date());
+        setSelectedTime(new Date());
+        setRequired('');
+    };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
@@ -226,6 +235,8 @@ const Heartrate = ({ navigation }) => {
             <Modal
                 isVisible={isModalVisible}
                 style={styles.model}
+                onModalShow={resetModalState}
+                onModalHide={resetModalState}
             >
                 <View style={{ flex: 1 }}>
                     <View style={{ alignItems: 'center', marginTop: 25 }}>
@@ -276,11 +287,14 @@ const Heartrate = ({ navigation }) => {
                         </View>
                         <View style={styles.rate}>
                             <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Pulse Rate (bpm)</Text>
-                            <View style={{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                            <View style={[{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.5, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }, { borderColor: required ? '#cc0000' : '#4A4A4A' }]}>
                                 <TextInput style={{ color: '#4A4A4A', fontFamily: 'Mulish-Bold', fontSize: 18, textAlign: 'center' }}
                                     maxLength={4}
                                     keyboardType='numeric'
-                                    onChangeText={(text) => setPulse(text)}
+                                    onChangeText={(text) => {
+                                        setRequired(false)
+                                        setPulse(text)
+                                    }}
 
 
                                 />
@@ -289,7 +303,7 @@ const Heartrate = ({ navigation }) => {
 
                         </View>
 
-                        {required ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
+                        {required ? <Text style={{ color: "#cc0000", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'center', top: 85 }}>

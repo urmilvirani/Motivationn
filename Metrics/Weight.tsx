@@ -6,6 +6,7 @@ import webservices from '../Navigation/webservices';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Metricloader from '../component/Metricloader';
 import Weightinfo from '../Information/Weightinfo';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const Weight = ({ navigation }) => {
@@ -48,10 +49,19 @@ const Weight = ({ navigation }) => {
         hideTimePicker();
     };
 
-    useEffect(() => {
-        weightapi()
+    // useEffect(() => {
+    //     weightapi()
 
-    }, [])
+    // }, [])
+
+    useFocusEffect(
+        React.useCallback(() => {
+            weightapi();
+            return () => {
+                // Cleanup function (if needed)
+            };
+        }, [])
+    );
 
 
     const weightapi = async () => {
@@ -88,9 +98,7 @@ const Weight = ({ navigation }) => {
                 setRequired(true)
                 return
             }
-            else {
-                setRequired(false)
-            }
+
             const year = selectedDate.getFullYear();
             const month = String(selectedDate.getMonth() + 1).padStart(2, '0'); // Month starts from 0
             const day = String(selectedDate.getDate()).padStart(2, '0');
@@ -110,6 +118,7 @@ const Weight = ({ navigation }) => {
             const save = await webservices('weight_measurement/save', "POST", data)
             console.log('saved', save.message);
             // setPulse(save)
+            weightapi()
             setModalVisible(false)
 
         }
@@ -149,7 +158,12 @@ const Weight = ({ navigation }) => {
 
 
     )
-
+    const resetModalState = () => {
+        setweigh('');
+        setSelectedDate(new Date());
+        setSelectedTime(new Date());
+        setRequired('');
+    };
 
     const [isModalVisible, setModalVisible] = useState(false);
     return (
@@ -206,6 +220,8 @@ const Weight = ({ navigation }) => {
             <Modal
                 isVisible={isModalVisible}
                 style={styles.model}
+                onModalShow={resetModalState}
+                onModalHide={resetModalState}
             >
                 <View style={{ flex: 1 }}>
                     <View style={{ alignItems: 'center', marginTop: 25 }}>
@@ -258,16 +274,19 @@ const Weight = ({ navigation }) => {
                         </View>
                         <View style={styles.rate}>
                             <Text style={{ color: 'black', fontFamily: 'Mulish-Regular', fontSize: 16, }}>Weight (kg)</Text>
-                            <View style={{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.2, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }}>
+                            <View style={[{ height: 54, width: 125, borderColor: '#4A4A4A', borderWidth: 0.5, alignItems: 'center', justifyContent: 'center', borderRadius: 5 }, { borderColor: required ? '#cc0000' : '#4A4A4A' }]}>
                                 <TextInput
                                     keyboardType='numeric'
                                     maxLength={4}
                                     style={{ color: '#4A4A4A', fontFamily: 'Mulish-Bold', fontSize: 18, textAlign: "center" }}
-                                    onChangeText={(text) => setweigh(text)}
+                                    onChangeText={(text) => {
+                                        setRequired(false)
+                                        setweigh(text)
+                                    }}
                                 />
                             </View>
                         </View>
-                        {required ? <Text style={{ color: "red", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
+                        {required ? <Text style={{ color: "#cc0000", fontFamily: "Mulish-ExtraBold", marginTop: 0, fontSize: 12, width: '94%', marginStart: 0, textAlign: 'right' }}>This field is required</Text> : null}
                     </View>
                     <View style={{ flexDirection: 'row', marginTop: 90, justifyContent: 'center' }}>
                         <TouchableOpacity
